@@ -335,153 +335,151 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  )
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
+  ;; Do not write anything past this comment. This is where Emacs will
+  ;; auto-generate custom variable definitions.
 
 
-(setq
- user-full-name "Pablo Palacios Avila"
- user-mail-address "ppalacios_avila@hotmail.com")
-;; File lookup
-(use-package helm-projectile
-  :defer t
-  :commands (helm-overlord)
-  :init
-  (global-set-key (kbd "C-c o") 'helm-overlord)
-  :config
-  (progn
-    (defun helm-overlord (&rest arg)
-      ;; just in case someone decides to pass an argument, helm-omni won't fail.
-      (interactive)
-      (helm-other-buffer
-       (append ;; projectile errors out if you're not in a project
-        (when (projectile-project-p) ;; so look before you leap
-          '(helm-source-projectile-buffers-list
-            helm-source-projectile-recentf-list
-            helm-source-projectile-files-list)
-          ) ;; files in current directory
-        '(helm-source-buffers-list ;; list of all open buffers
-          helm-source-recentf ;; all recent files
-          helm-source-files-in-current-dir
-          helm-source-bookmarks ;; bookmarks too
-          helm-source-buffer-not-found)) ;; ask to create a buffer otherwise
-       "*all-seeing-eye*"))
+  (setq
+   user-full-name "Pablo Palacios Avila"
+   user-mail-address "ppalacios_avila@hotmail.com")
+  ;; File lookup
+  (use-package helm-projectile
+    :defer t
+    :commands (helm-overlord)
+    :init
+    (global-set-key (kbd "C-c o") 'helm-overlord)
+    :config
+    (progn
+      (defun helm-overlord (&rest arg)
+        ;; just in case someone decides to pass an argument, helm-omni won't fail.
+        (interactive)
+        (helm-other-buffer
+         (append ;; projectile errors out if you're not in a project
+          (when (projectile-project-p) ;; so look before you leap
+            '(helm-source-projectile-buffers-list
+              helm-source-projectile-recentf-list
+              helm-source-projectile-files-list)
+            ) ;; files in current directory
+          '(helm-source-buffers-list ;; list of all open buffers
+            helm-source-recentf ;; all recent files
+            helm-source-files-in-current-dir
+            helm-source-bookmarks ;; bookmarks too
+            helm-source-buffer-not-found)) ;; ask to create a buffer otherwise
+         "*all-seeing-eye*"))
+      )
     )
+  ;; Org config
+  ;; Fontify org-mode code blocks
+  (setq-default
+   org-src-fontify-natively t
+   ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
+   org-replace-disputed-keys t
+   org-hide-leading-stars t
+   org-odd-levels-only t
+   ;; TODO progress logging stuff
+   org-log-done 'time
+   )
+
+  ;; Javascript
+  (setq-default
+   js2-basic-offset 2
+   js-indent-level 2
+   js2-mode-show-strict-warnings nil
+   js2-mode-show-parse-errors nil
+   )
+  ;; https://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
+  (defun use-linter-from-node-modules (linter-name exec-path)
+    (let* ((root (locate-dominating-file
+                  (or (buffer-file-name) default-directory)
+                  "node_modules"))
+           (linter (and root
+                        (expand-file-name
+                         (concat (file-name-as-directory "node_modules")
+                                 exec-path)
+                         root))))
+      (when (and linter (file-executable-p linter))
+        (set (make-local-variable
+              (intern (concat "flycheck-" linter-name "-executable"))) linter))))
+  (defun use-eslint-from-node-modules ()
+    (use-linter-from-node-modules
+     "javascript-eslint"
+     ".bin/eslint"))
+
+  ;; ESlint
+  (add-hook 'js2-mode-hook 'use-eslint-from-node-modules)
+  (add-hook 'js-mode-hook 'use-eslint-from-node-modules)
+
+  (add-hook 'scss-mode-hook
+            (lambda ()
+              (use-linter-from-node-modules
+               "sass/scss-sass-lint"
+               "sass-lint/bin/sass-lint.js")))
+  (setq-default
+   flycheck-eslintrc ".eslintrc*")
+  ;; Web-mode
+  (setq-default
+   css-indent-offset 2
+   web-mode-markup-indent-offset 2
+   web-mode-css-indent-offset 2
+   web-mode-code-indent-offset 2
+   web-mode-attr-indent-offset 2
+   emmet-self-closing-tag-style " /"
+   emmet-indentation 2
+   )
+  (use-package emmet-mode
+    :defer t
+    :config
+    (progn
+      (unbind-key "<emacs-state> TAB" emmet-mode-keymap)
+      (unbind-key "<emacs-state> <tab>" emmet-mode-keymap)))
+  ;; Python
+  (setq-default
+   python-shell-interpreter "python3.5"
+   )
+
+  ;; Expand Region
+  (setq-default
+   expand-region-fast-keys-enabled nil
+   )
+
+  ;; Smart parens global mode
+  (smartparens-global-mode t)
+
+  ;; ------Smart parens bindings------
+  ;; Delete
+  (define-key sp-keymap (kbd "C-k") 'sp-kill-hybrid-sexp)
+  (define-key sp-keymap (kbd "M-<backspace>") 'sp-backward-unwrap-sexp)
+  (define-key sp-keymap (kbd "C-M-<backspace>") 'sp-splice-sexp-killing-backward)
+  (define-key sp-keymap (kbd "C-M-f") 'sp-forward-sexp)
+  (define-key sp-keymap (kbd "C-M-b") 'sp-backward-sexp)
+  (define-key sp-keymap (kbd "C-M-d") 'sp-down-sexp)
+  (define-key sp-keymap (kbd "C-M-a") 'sp-beginning-of-sexp)
+  (define-key sp-keymap (kbd "C-M-e") 'sp-up-sexp)
+  ;; Move parens
+  (define-key sp-keymap (kbd "<C-right>") 'sp-forward-slurp-sexp)
+  (define-key sp-keymap (kbd "<C-left>") 'sp-backward-slurp-sexp)
+
+  ;; Expand region binding
+  (global-set-key (kbd "C-\\") 'er/expand-region)
+  ;; Mark paragraph
+  (global-set-key (kbd "M-h") 'mark-paragraph)
+  ;; <menu> key
+  (global-set-key (kbd "<menu>") 'helm-M-x)
+  ;; prevent madness
+  (global-set-key (kbd "C-x 2")
+                  (lambda ()
+                    (interactive)
+                    (split-window-vertically)
+                    (other-window 1)))
+  (global-set-key (kbd "C-x 3")
+                  (lambda ()
+                    (interactive)
+                    (split-window-horizontally)
+                    (other-window 1)))
+  (delete-selection-mode t)
+
   )
 
-;; Org config
-;; Fontify org-mode code blocks
-(setq-default
- org-src-fontify-natively t
- ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
- org-replace-disputed-keys t
- org-hide-leading-stars t
- org-odd-levels-only t
- ;; TODO progress logging stuff
- org-log-done 'time
- )
-
-;; Javascript
-(setq-default
- js2-basic-offset 2
- js-indent-level 2
- js2-mode-show-strict-warnings nil
- js2-mode-show-parse-errors nil
- )
-;; https://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
-(defun use-linter-from-node-modules (linter-name exec-path)
-  (let* ((root (locate-dominating-file
-                (or (buffer-file-name) default-directory)
-                "node_modules"))
-         (linter (and root
-                      (expand-file-name
-                       (concat (file-name-as-directory "node_modules")
-                               exec-path)
-                       root))))
-    (when (and linter (file-executable-p linter))
-      (set (make-local-variable
-            (intern (concat "flycheck-" linter-name "-executable"))) linter))))
-(defun use-eslint-from-node-modules ()
-  (use-linter-from-node-modules
-   "javascript-eslint"
-   ".bin/eslint"))
-
-;; ESlint
-(add-hook 'js2-mode-hook 'use-eslint-from-node-modules)
-(add-hook 'js-mode-hook 'use-eslint-from-node-modules)
-
-(add-hook 'scss-mode-hook
-          (lambda ()
-            (use-linter-from-node-modules
-             "sass/scss-sass-lint"
-             "sass-lint/bin/sass-lint.js")))
-(setq-default
- flycheck-eslintrc ".eslintrc*")
-;; Web-mode
-(setq-default
- css-indent-offset 2
- web-mode-markup-indent-offset 2
- web-mode-css-indent-offset 2
- web-mode-code-indent-offset 2
- web-mode-attr-indent-offset 2
- emmet-self-closing-tag-style " /"
- emmet-indentation 2
- )
-(use-package emmet-mode
-  :defer t
-  :config
-  (progn
-    (unbind-key "<emacs-state> TAB" emmet-mode-keymap)
-    (unbind-key "<emacs-state> <tab>" emmet-mode-keymap)))
-;; Python
-(setq-default
- python-shell-interpreter "python3.5"
- )
-
-;; Expand Region
-(setq-default
- expand-region-fast-keys-enabled nil
- )
-
-;; Smart parens global mode
-(smartparens-global-mode t)
-
-;; ------Smart parens bindings------
-;; Delete
-(define-key sp-keymap (kbd "C-k") 'sp-kill-hybrid-sexp)
-(define-key sp-keymap (kbd "M-<backspace>") 'sp-backward-unwrap-sexp)
-(define-key sp-keymap (kbd "C-M-<backspace>") 'sp-splice-sexp-killing-backward)
-(define-key sp-keymap (kbd "C-M-f") 'sp-forward-sexp)
-(define-key sp-keymap (kbd "C-M-b") 'sp-backward-sexp)
-(define-key sp-keymap (kbd "C-M-d") 'sp-down-sexp)
-(define-key sp-keymap (kbd "C-M-a") 'sp-beginning-of-sexp)
-(define-key sp-keymap (kbd "C-M-e") 'sp-up-sexp)
-;; Move parens
-(define-key sp-keymap (kbd "<C-right>") 'sp-forward-slurp-sexp)
-(define-key sp-keymap (kbd "<C-left>") 'sp-backward-slurp-sexp)
-
-;; Expand region binding
-(global-set-key (kbd "C-\\") 'er/expand-region)
-;; Mark paragraph
-(global-set-key (kbd "M-h") 'mark-paragraph)
-;; <menu> key
-(global-set-key (kbd "<menu>") 'helm-M-x)
-;; prevent madness
-(global-set-key (kbd "C-x 2")
-                (lambda ()
-                  (interactive)
-                  (split-window-vertically)
-                  (other-window 1)))
-(global-set-key (kbd "C-x 3")
-                (lambda ()
-                  (interactive)
-                  (split-window-horizontally)
-                  (other-window 1)))
-(delete-selection-mode t)
-
-)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -501,3 +499,4 @@ you should place your code here."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
