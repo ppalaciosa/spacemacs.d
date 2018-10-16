@@ -326,6 +326,9 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+(add-to-list 'default-frame-alist
+'(font . "-ADBE-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1"))
+
   )
 
 (defun dotspacemacs/user-config ()
@@ -434,7 +437,7 @@ you should place your code here."
       (unbind-key "<emacs-state> <tab>" emmet-mode-keymap)))
   ;; Python
   (setq-default
-   python-shell-interpreter "python3.5"
+   python-shell-interpreter "python3"
    )
 
   ;; Expand Region
@@ -491,7 +494,6 @@ you should place your code here."
  '(js2-indent-switch-body t)
  '(js2-mode-assume-strict t)
  '(js2-mode-show-strict-warnings nil)
- '(magit-commit-arguments (quote ("--gpg-sign=75D9D625ABF40969")))
  '(magit-log-arguments (quote ("--graph" "--decorate" "--show-signature" "-n256"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -500,3 +502,28 @@ you should place your code here."
  ;; If there is more than one, they won't work right.
  )
 
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(js2-indent-switch-body t)
+ '(js2-mode-assume-strict t)
+ '(js2-mode-show-strict-warnings nil)
+ '(magit-commit-arguments (quote ("--gpg-sign=75D9D625ABF40969")))
+ '(magit-log-arguments (quote ("--graph" "--decorate" "--show-signature" "-n256")))
+ '(package-selected-packages
+   (quote
+    (yasnippet undo-tree rainbow-mode nameless mmm-mode json-mode js2-mode evil-unimpaired f s dash csv-mode company-statistics company auctex aggressive-indent ace-window avy which-key org-plus-contrib hydra font-lock+ async))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
