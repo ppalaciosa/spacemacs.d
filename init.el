@@ -440,6 +440,9 @@ you should place your code here."
    python-shell-interpreter "python3"
    )
 
+  ;; Latex
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+
   ;; Expand Region
   (setq-default
    expand-region-fast-keys-enabled nil
