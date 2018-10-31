@@ -1,4 +1,4 @@
-;; -*- mode: emacs-lisp -*-
+;; -*- mode: dotspacemacs -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
@@ -11,58 +11,56 @@ values."
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
-   ;; Lazy installation of layers (i.e. layers are installed only when a file
-   ;; with a supported type is opened). Possible values are `all', `unused'
-   ;; and `nil'. `unused' will lazy install only unused layers (i.e. layers
-   ;; not listed in variable `dotspacemacs-configuration-layers'), `all' will
-   ;; lazy install any layer that support lazy installation even the layers
-   ;; listed in `dotspacemacs-configuration-layers'. `nil' disable the lazy
-   ;; installation feature and you have to explicitly list a layer in the
-   ;; variable `dotspacemacs-configuration-layers' to install it.
-   ;; (default 'unused)
-   dotspacemacs-enable-lazy-installation 'unused
-   ;; If non-nil then Spacemacs will ask for confirmation before installing
-   ;; a layer lazily. (default t)
-   dotspacemacs-ask-for-lazy-installation t
-   ;; If non-nil layers with lazy install support are lazy installed.
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
-   dotspacemacs-configuration-layer-path '()
-   ;; List of configuration layers to load.
-
+   dotspacemacs-configuration-layer-path '("~/.spacemacs.d/private/")
+   ;; List of configuration layers to load. If it is the symbol `all' instead
+   ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
-     ruby
+     better-defaults
+     helm
      (auto-completion :variables
+                      auto-completion-return-key-behavior nil
+                      auto-completion-tab-key-behavior 'complete
                       auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-help-tooltip t
+                      auto-completion-complete-with-key-sequence-delay 0.1
                       auto-completion-enable-sort-by-usage t)
      syntax-checking
-     themes-megapack
+     (spell-checking :variables
+                     spell-checking-enable-by-default nil
+                     enable-flyspell-auto-completion nil)
      better-defaults
-     (colors :variables colors-enable-rainbow-identifiers t)
+     (colors :variables
+             colors-enable-rainbow-identifiers t)
 
      ;; Programming Languages
-     c-c++
+     (c-c++ :variables
+            c-c++-default-mode-for-headers 'c++-mode)
      clojure
      emacs-lisp
+     major-modes
      (javascript
       :variables javascript-backend 'tern
       node-add-modules-path t)
      (tern :variables tern-disable-port-files nil)
      python
-     extra-langs
+     ruby
+     (sql :variables sql-capitalize-keywords t)
 
      ;; Non-programming languages
      markdown
-     org
      yaml
      csv
      raml
 
+     ;; Bring order to life
+     (org :variables org-enable-reveal-js-support t)
      ;; Documents
      latex
      bibtex
+     restructuredtext
 
      ;; Web
      html
@@ -76,6 +74,8 @@ values."
      ansible
      docker
      git
+     systemd
+     (shell :variables shell-default-shell 'multi-term)
 
      ;; fun stuff
      xkcd
@@ -88,16 +88,19 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-
-
    dotspacemacs-additional-packages
    '(
+     js-comint
      editorconfig
+     graphql-mode
+     (yasnippet :location elpa)
+     gnus-desktop-notify
+     exec-path-from-shell
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
-   ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '()
+   ;; A list of packages and/or extensions that will not be install and loaded.
+   dotspacemacs-excluded-packages '(auto-complete-rst)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -150,14 +153,11 @@ values."
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
    dotspacemacs-startup-banner 'official
-   ;; List of items to show in startup buffer or an association list of
-   ;; the form `(list-type . list-size)`. If nil then it is disabled.
-   ;; Possible values for list-type are:
-   ;; `recents' `bookmarks' `projects' `agenda' `todos'."
-   ;; List sizes may be nil, in which case
-   ;; `spacemacs-buffer-startup-lists-length' takes effect.
-   dotspacemacs-startup-lists '((recents . 5)
-                                (projects . 7))
+   ;; List of items to show in the startup buffer. If nil it is disabled.
+   ;; Possible values are: `recents' `bookmarks' `projects'.
+   ;; (default '(recents projects))
+   dotspacemacs-startup-lists '((recents . 7)
+                                (projects . 5))
    ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
@@ -166,16 +166,31 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(spacemacs-dark
-                         spacemacs-light)
+                         spacemacs-light
+                         solarized-light
+                         solarized-dark
+                         leuven
+                         monokai
+                         zenburn)
+
+   ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
+   ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
+   ;; are spaceline themes. `vanilla' is default Emacs mode-line. `custom' is a
+   ;; user defined themes, refer to the DOCUMENTATION.org for more info on how
+   ;; to create your own spaceline theme. Value can be a symbol or list with\
+   ;; additional properties.
+   ;; (default '(spacemacs :separator wave :separator-scale 1.5))
+   dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
+
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
-   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
-   ;; quickly tweak the mode-line size to make separators look not too crappy.
+   ;; Default font. `powerline-Scale' Allows to quickly tweak the mode-line
+   ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
                                :size 13
                                :weight normal
                                :width normal
-                               :powerline-scale 1.1)
+                               :powerline-scale 1.0)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
@@ -282,8 +297,8 @@ values."
    ;; If non nil unicode symbols are displayed in the mode line. (default t)
    dotspacemacs-mode-line-unicode-symbols t
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
-   ;; scrolling overrides the default behavior of Emacs which recenters point
-   ;; when it reaches the top or bottom of the screen. (default t)
+   ;; scrolling overrides the default behavior of Emacs which recenters the
+   ;; point when it reaches the top or bottom of the screen. (default t)
    dotspacemacs-smooth-scrolling t
    ;; If non nil line numbers are turned on in all `prog-mode' and `text-mode'
    ;; derivatives. If set to `relative', also turns on relative line numbers.
@@ -303,7 +318,7 @@ values."
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
    ;; emphasis the current one). (default 'all)
    dotspacemacs-highlight-delimiters 'all
-   ;; If non nil, advise quit functions to keep server open when quitting.
+   ;; If non nil advises quit functions to keep server open when quitting.
    ;; (default nil)
    dotspacemacs-persistent-server nil
    ;; List of search tool executable names. Spacemacs uses the first installed
@@ -319,7 +334,7 @@ values."
    ;; `trailing' to delete only the whitespace at end of lines, `changed'to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup nil
+   dotspacemacs-whitespace-cleanup "changed"
    ))
 
 (defun dotspacemacs/user-init ()
@@ -329,8 +344,15 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-(add-to-list 'default-frame-alist
-'(font . "-ADBE-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1"))
+  (setq
+   custom-file "~/.spacemacs.d/.custom-settings"
+   ;; Avoid using helm when completing at point
+   ;; helm-mode-handle-completion-in-region nil
+   gnus-init-file "~/.spacemacs.d/gnus.el"
+   )
+
+  (add-to-list 'default-frame-alist
+               '(font . "-ADBE-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1"))
 
   )
 
@@ -340,88 +362,206 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
-you should place your code here."
-  ;; Do not write anything past this comment. This is where Emacs will
-  ;; auto-generate custom variable definitions.
-
-
+you should place you code here."
   (setq
    user-full-name "Pablo Palacios Avila"
    user-mail-address "ppalacios_avila@hotmail.com")
+
+  ;; GPG related options
+  (setq
+   magit-log-arguments '("--graph" "--decorate" "--show-signature" "-n256")
+   )
+
+  ;; Exec-path-from-shell
+  (setq
+   exec-path-from-shell-variables '(
+                                    "PATH"
+                                    "MANPATH"
+                                    "SSH_AUTHSOCK"
+                                    "WORKON_HOME"
+                                    "PYENV_ROOT"
+                                    "PIPENV_DEFAULT_PYTHON_VERSION"
+                                    ))
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+
+  ;; Mode line
+  (setq
+   spaceline-battery-p nil
+   spaceline-org-clock-p t
+   spaceline-hud-p nil
+   )
+  (spacemacs/toggle-mode-line-battery-on)
+
+  ;; Dired
+  ;; Load Dired X when Dired is loaded.
+  (require 'dired-x)
+  (setq-default dired-omit-files-p t) ; Buffer-local variable
+  (setq
+   dired-omit-files (concat "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\.tern-port$")
+   dired-omit-verbose nil
+   dired-listing-switches "-alh --group-directories-first"
+   )
+
+  ;; set-mark bug on emacs 25.1 workaround... in theory
+  (require 'ansible-doc)
+
+  ;; Avoid calling autocompletion-in-region
+  (with-eval-after-load "company"
+    (define-key spacemacs-js2-mode-map-root-map
+      (kbd "<tab>") 'company-indent-or-complete-common)
+    (define-key spacemacs-rjsx-mode-map-root-map
+      (kbd "<tab>") 'company-indent-or-complete-common)
+    )
+
+
+  ;; Ispell config
+  (with-eval-after-load "ispell"
+    (setq-default ispell-program-name "hunspell"
+                  ispell-dictionary "castellano,english"
+                  )
+    (ispell-set-spellchecker-params)
+    (ispell-hunspell-add-multi-dic "castellano,english"))
+
   ;; File lookup
-  (use-package helm-projectile
-    :defer t
-    :commands (helm-overlord)
-    :init
-    (global-set-key (kbd "C-c o") 'helm-overlord)
+  (use-package helm
+    :defer nil
+    :bind ("C-c o" . helm-overlord)
     :config
     (progn
-      (defun helm-overlord (&rest arg)
-        ;; just in case someone decides to pass an argument, helm-omni won't fail.
+      (require 'helm-projectile)
+      (require 'helm-x-files)
+      (defun helm-overlord ()
         (interactive)
-        (helm-other-buffer
-         (append ;; projectile errors out if you're not in a project
-          (when (projectile-project-p) ;; so look before you leap
-            '(helm-source-projectile-buffers-list
-              helm-source-projectile-recentf-list
-              helm-source-projectile-files-list)
-            ) ;; files in current directory
-          '(helm-source-buffers-list ;; list of all open buffers
-            helm-source-recentf ;; all recent files
-            helm-source-files-in-current-dir
-            helm-source-bookmarks ;; bookmarks too
-            helm-source-buffer-not-found)) ;; ask to create a buffer otherwise
-         "*all-seeing-eye*"))
-      )
+        (helm :sources
+              '(helm-source-buffers-list
+                helm-source-projectile-buffers-list
+                helm-source-projectile-files-list
+                helm-source-projectile-projects
+                helm-source-recentf
+                helm-source-file-cache
+                )
+              :ff-transformer-show-only-basename nil
+              :buffer "*helm-overlord*"
+              :truncate-lines helm-buffers-truncate-lines
+              ))))
+
+  (use-package projectile
+    :config
+    (add-to-list 'projectile-globally-ignored-directories "node_modules")
     )
+
   ;; Org config
   ;; Fontify org-mode code blocks
   (setq-default
    org-src-fontify-natively t
-   ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M-- instead to toggle)
+   ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M--
+   ;; instead to toggle)
    org-replace-disputed-keys t
    org-hide-leading-stars t
    org-odd-levels-only t
+   org-ref-default-bibliography '("references.bib")
+   reftex-default-bibliography '("references.bib")
    ;; TODO progress logging stuff
    org-log-done 'time
+   org-latex-listings 'minted
+   org-latex-compiler "xelatex"
+   org-latex-pdf-process'("latexmk -pdf -f -pdflatex='xelatex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
+   org-latex-default-packages-alist '(
+                                      ;; Not used with XeLaTeX
+                                      ("AUTO" "inputenc" t ("pdflatex"))
+                                      ("T1" "fontenc" t ("pdflatex"))
+                                      ("" "fontspec" t ("xelatex"))
+                                      ("" "polyglossia" t ("xelatex"))
+                                      ("" "graphicx" t)
+                                      ("" "grffile" t)
+                                      ("" "longtable" nil)
+                                      ("" "wrapfig" nil)
+                                      ("" "rotating" nil)
+                                      ("normalem" "ulem" t)
+                                      ("" "amsmath" t)
+                                      ("" "textcomp" t)
+                                      ("" "amssymb" t)
+                                      ("" "capt-of" nil)
+                                      ("" "hyperref" nil)
+                                      ("dvipsnames" "xcolor")
+                                      )
+   ;; Agenda and clock
+   org-clock-persist 'history
    )
 
   ;; Javascript
   (setq-default
    js2-basic-offset 2
    js-indent-level 2
+   js2-mode-assume-strict t
+   js-switch-indent-offset 2
    js2-mode-show-strict-warnings nil
    js2-mode-show-parse-errors nil
+   js-expr-indent-offset 0
+   js-paren-indent-offset 0
+   json-reformat:indent-width 2
    )
-  ;; https://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
-  (defun use-linter-from-node-modules (linter-name exec-path)
-    (let* ((root (locate-dominating-file
-                  (or (buffer-file-name) default-directory)
-                  "node_modules"))
-           (linter (and root
-                        (expand-file-name
-                         (concat (file-name-as-directory "node_modules")
-                                 exec-path)
-                         root))))
-      (when (and linter (file-executable-p linter))
-        (set (make-local-variable
-              (intern (concat "flycheck-" linter-name "-executable"))) linter))))
-  (defun use-eslint-from-node-modules ()
-    (use-linter-from-node-modules
-     "javascript-eslint"
-     ".bin/eslint"))
 
-  ;; ESlint
-  (add-hook 'js2-mode-hook 'use-eslint-from-node-modules)
-  (add-hook 'js-mode-hook 'use-eslint-from-node-modules)
+  ;; Add .mjs extension autoload
+  (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js2-mode))
+  (add-to-list 'auto-mode-alist '("\\.tern-project\\'" . json-mode))
+
+  ;; json-mode by default locally sets indent-level to 4
+  (add-hook 'json-mode-hook
+            (lambda ()
+              (make-local-variable 'js-indent-level)
+              (setq js-indent-level 2)))
+
+  (advice-add
+   'js--multi-line-declaration-indentation
+   :around (lambda (orig-fun &rest args) nil))
+
+  (advice-add 'js--proper-indentation :override 'js--proper-indentation-custom)
+
+  (use-package js-comint
+    :ensure t
+    :init
+    (progn
+      (defun inferior-js-mode-hook-setup ()
+        (add-hook 'comint-output-filter-functions 'js-comint-process-output))
+      (add-hook 'inferior-js-mode-hook 'inferior-js-mode-hook-setup t)
+      (add-hook 'js2-mode-hook
+                (lambda ()
+                  (let ((bindlist
+                         '(("C-c c" . 'js-send-last-sexp)
+                           ("C-c C-b" . 'js-send-buffer)
+                           ("C-c C-f" . 'js-load-file))))
+                    (dolist (pair bindlist)
+                      (local-set-key (kbd (car pair)) (cdr pair)))))))
+    )
 
   (add-hook 'scss-mode-hook
             (lambda ()
               (use-linter-from-node-modules
                "sass/scss-sass-lint"
                "sass-lint/bin/sass-lint.js")))
+
+  (add-hook 'web-mode-hook 'rainbow-mode)
+  (add-hook 'js2-mode-hook 'rainbow-mode)
+
+  (use-package rjsx-mode
+    :defer t
+    :config
+    (require 'mmm-mode)
+    )
+
+  ;; GraphQL
+  (use-package graphql-mode
+    :ensure t
+    :mode "\\.graphql\\'"
+    :init
+    (spacemacs|diminish graphql-mode "⬡" "g")
+    )
+
   (setq-default
    flycheck-eslintrc ".eslintrc*")
+
   ;; Web-mode
   (setq-default
    css-indent-offset 2
@@ -438,9 +578,34 @@ you should place your code here."
     (progn
       (unbind-key "<emacs-state> TAB" emmet-mode-keymap)
       (unbind-key "<emacs-state> <tab>" emmet-mode-keymap)))
+
   ;; Python
-  (setq-default
+  (setq
    python-shell-interpreter "python3"
+   flycheck-python-flake8-executable "python3"
+   flycheck-python-pylint-executable "python3"
+   )
+
+  (use-package pipenv
+    :defer t
+    :config
+    (progn
+      (setq
+       pipenv-projectile-after-switch-function
+       #'pipenv-projectile-after-switch-extended)
+      (spacemacs|diminish pipenv-mode "🎁" "p")
+      (add-hook 'python-mode-hook
+                #'(lambda ()
+                    (setq flycheck-checker 'python-pylint)
+                    (pipenv-mode)))
+      ))
+
+  (spacemacs|diminish anaconda-mode "🐍" "a")
+  ;; Matlab
+  (setq-default
+   pipenv-with-flycheck t
+   pipenv-with-projectile t
+   matlab-shell-command-switches '("-nodesktop" "-nosplash")
    )
 
   ;; Latex
@@ -452,7 +617,7 @@ you should place your code here."
    )
 
   ;; Smart parens global mode
-  (smartparens-global-mode t)
+  (spacemacs/toggle-smartparens-globally-on)
 
   ;; ------Smart parens bindings------
   ;; Delete
@@ -485,47 +650,88 @@ you should place your code here."
                     (interactive)
                     (split-window-horizontally)
                     (other-window 1)))
+  ;; Prevent madness
   (delete-selection-mode t)
 
+  (spacemacs|diminish wakatime-mode "🕑" "w")
+
+  (spacemacs|diminish holy-mode "✝️" "h")
+  (setq
+   safe-local-variable-values
+   '(
+     (encoding . utf-8)
+     (encoding . utf8)
+     (org-latex-minted-options '(("bgcolor=MonokaiBg")))
+     (org-latex-minted-options quote
+                               (("bgcolor" "MonokaiBg")))
+     (ispell-dictionary . "castellano,english")
+     (ispell-dictionary . "castellano")
+     (ispell-dictionary . "english")))
   )
 
 
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(js2-indent-switch-body t)
- '(js2-mode-assume-strict t)
- '(js2-mode-show-strict-warnings nil)
- '(magit-log-arguments (quote ("--graph" "--decorate" "--show-signature" "-n256"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(js2-indent-switch-body t)
- '(js2-mode-assume-strict t)
- '(js2-mode-show-strict-warnings nil)
- '(magit-log-arguments (quote ("--graph" "--decorate" "--show-signature" "-n256"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:background nil)))))
-)
+(defun js--proper-indentation-custom (parse-status)
+  "Return the proper indentation for the current line."
+  (save-excursion
+    (back-to-indentation)
+    (cond ((nth 4 parse-status)    ; inside comment
+           (js--get-c-offset 'c (nth 8 parse-status)))
+          ((nth 3 parse-status) 0) ; inside string
+          ((eq (char-after) ?#) 0)
+          ((save-excursion (js--beginning-of-macro)) 4)
+          ;; Indent array comprehension continuation lines specially.
+          ((let ((bracket (nth 1 parse-status))
+                 beg)
+             (and bracket
+                  (not (js--same-line bracket))
+                  (setq beg (js--indent-in-array-comp bracket))
+                  ;; At or after the first loop?
+                  (>= (point) beg)
+                  (js--array-comp-indentation bracket beg))))
+          ((js--ctrl-statement-indentation))
+          ((nth 1 parse-status)
+           ;; A single closing paren/bracket should be indented at the
+           ;; same level as the opening statement. Same goes for
+           ;; "case" and "default".
+           (let ((same-indent-p (looking-at "[]})]"))
+                 (switch-keyword-p (looking-at "default\\_>\\|case\\_>[^:]"))
+                 (continued-expr-p (js--continued-expression-p))
+                 (original-point (point))
+                 (open-symbol (nth 1 parse-status)))
+             (goto-char (nth 1 parse-status)) ; go to the opening char
+             (skip-syntax-backward " ")
+             (when (eq (char-before) ?\)) (backward-list))
+             (back-to-indentation)
+             (js--maybe-goto-declaration-keyword-end parse-status)
+             (let* ((in-switch-p (unless same-indent-p
+                                   (looking-at "\\_<switch\\_>")))
+                    (same-indent-p (or same-indent-p
+                                       (and switch-keyword-p
+                                            in-switch-p)))
+                    (indent
+                     (cond (same-indent-p
+                            (current-column))
+                           (continued-expr-p
+                            (goto-char original-point)
+                            ;; Go to beginning line of continued expression.
+                            (while (js--continued-expression-p)
+                              (forward-line -1))
+                            ;; Go to the open symbol if it appears later.
+                            (when (> open-symbol (point))
+                              (goto-char open-symbol))
+                            (back-to-indentation)
+                            (+ (current-column)
+                               js-indent-level
+                               js-expr-indent-offset))
+                           (t
+                            (+ (current-column) js-indent-level
+                               (pcase (char-after (nth 1 parse-status))
+                                 (?\( js-paren-indent-offset)
+                                 (?\[ js-square-indent-offset)
+                                 (?\{ js-curly-indent-offset)))))))
+               (if in-switch-p
+                   (+ indent js-switch-indent-offset)
+                 indent))))
+          ((js--continued-expression-p)
+           (+ js-indent-level js-expr-indent-offset))
+          (t 0))))
