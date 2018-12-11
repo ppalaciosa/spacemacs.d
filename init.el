@@ -470,6 +470,7 @@ you should place you code here."
    reftex-default-bibliography '("references.bib")
    ;; TODO progress logging stuff
    org-log-done 'time
+   org-export-with-sub-superscripts nil
    org-latex-listings 'minted
    org-latex-compiler "xelatex"
    org-latex-pdf-process'("latexmk -pdf -f -pdflatex='xelatex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
