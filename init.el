@@ -41,7 +41,9 @@ values."
      emacs-lisp
      major-modes
      (javascript
-      :variables javascript-backend 'tern
+      :variables
+      js2-basic-offset 2
+      javascript-backend 'tern
       node-add-modules-path t)
      (tern :variables tern-disable-port-files nil)
      (python :variables python-backend 'anaconda)
