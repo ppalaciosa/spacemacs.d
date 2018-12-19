@@ -551,6 +551,7 @@ you should place you code here."
   (add-hook 'web-mode-hook 'rainbow-mode)
   (add-hook 'js2-mode-hook 'rainbow-mode)
 
+<<<<<<< HEAD
   (use-package rjsx-mode
     :defer t
     :config
@@ -568,6 +569,8 @@ you should place you code here."
   (setq-default
    flycheck-eslintrc ".eslintrc*")
 
+=======
+>>>>>>> e2f2429... Remove mmm-mode related code
   ;; Web-mode
   (setq-default
    css-indent-offset 2
