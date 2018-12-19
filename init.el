@@ -555,6 +555,7 @@ you should place you code here."
   (add-hook 'js2-mode-hook 'rainbow-mode)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   (use-package rjsx-mode
     :defer t
     :config
@@ -574,6 +575,8 @@ you should place you code here."
 
 =======
 >>>>>>> e2f2429... Remove mmm-mode related code
+=======
+>>>>>>> Remove mmm-mode related code
   ;; Web-mode
   (setq-default
    css-indent-offset 2
