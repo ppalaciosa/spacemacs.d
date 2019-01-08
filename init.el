@@ -402,13 +402,15 @@ you should place you code here."
 
   ;; Dired
   ;; Load Dired X when Dired is loaded.
-  (require 'dired-x)
-  (setq-default dired-omit-files-p t) ; Buffer-local variable
-  (setq
-   dired-omit-files (concat "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\.tern-port$")
-   dired-omit-verbose nil
-   dired-listing-switches "-alh --group-directories-first"
-   )
+  (with-eval-after-load 'dired
+    (require 'dired-x)
+    (setq-default dired-omit-files-p t) ; Buffer-local variable
+    (setq
+     dired-omit-files (concat "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\.tern-port$")
+     dired-omit-verbose nil
+     dired-listing-switches "-alh --group-directories-first"
+     )
+    )
 
 <<<<<<< HEAD
   ;; set-mark bug on emacs 25.1 workaround... in theory
@@ -489,7 +491,6 @@ you should place you code here."
 
   ;; File lookup
   (use-package helm
-    :defer nil
     :bind ("C-c o" . helm-overlord)
     :config
     (progn
@@ -510,10 +511,8 @@ you should place you code here."
               :truncate-lines helm-buffers-truncate-lines
               ))))
 
-  (use-package projectile
-    :config
-    (add-to-list 'projectile-globally-ignored-directories "node_modules")
-    )
+  (with-eval-after-load 'projectile
+    (add-to-list 'projectile-globally-ignored-directories "node_modules"))
 
   ;; Org config
   ;; Fontify org-mode code blocks
@@ -584,25 +583,28 @@ you should place you code here."
 
   (advice-add 'js--proper-indentation :override 'js--proper-indentation-custom)
 
-  (use-package js-comint
-    :ensure t
-    :init
-    (progn
-      (defun inferior-js-mode-hook-setup ()
-        (add-hook 'comint-output-filter-functions 'js-comint-process-output))
-      (add-hook 'inferior-js-mode-hook 'inferior-js-mode-hook-setup t)
-      (add-hook 'js2-mode-hook
-                (lambda ()
-                  (let ((bindlist
-                         '(("C-c c" . 'js-send-last-sexp)
-                           ("C-c C-b" . 'js-send-buffer)
-                           ("C-c C-f" . 'js-load-file))))
-                    (dolist (pair bindlist)
-                      (local-set-key (kbd (car pair)) (cdr pair)))))))
+  (with-eval-after-load 'js2-mode
+    (use-package js-comint
+      :ensure t
+      :init
+      (progn
+        (defun inferior-js-mode-hook-setup ()
+          (add-hook 'comint-output-filter-functions 'js-comint-process-output))
+        (add-hook 'inferior-js-mode-hook 'inferior-js-mode-hook-setup t)
+        (add-hook 'js2-mode-hook
+                  (lambda ()
+                    (let ((bindlist
+                           '(("C-c c" . 'js-send-last-sexp)
+                             ("C-c C-b" . 'js-send-buffer)
+                             ("C-c C-f" . 'js-load-file))))
+                      (dolist (pair bindlist)
+                        (local-set-key (kbd (car pair)) (cdr pair)))))))
+      )
     )
 
   ;; Redeclare eslint checker to not wait for a configuration file
-  (flycheck-define-checker javascript-eslint
+  (with-eval-after-load 'flycheck
+    (flycheck-define-checker javascript-eslint
     "A Javascript syntax and style checker using eslint.
      See URL `https://eslint.org/'."
     :command ("eslint" "--format=json"
@@ -624,6 +626,7 @@ you should place you code here."
           :label "config file"
           :message (if have-config "found" "missing or incorrect")
           :face (if have-config 'success '(bold error)))))))
+    )
 
   (add-hook 'scss-mode-hook
             (lambda ()
@@ -671,9 +674,8 @@ you should place you code here."
    emmet-self-closing-tag-style " /"
    emmet-indentation 2
    )
-  (use-package emmet-mode
-    :defer t
-    :config
+
+  (with-eval-after-load 'emmet-mode
     (progn
       (unbind-key "<emacs-state> TAB" emmet-mode-keymap)
       (unbind-key "<emacs-state> <tab>" emmet-mode-keymap)))
@@ -685,9 +687,7 @@ you should place you code here."
    flycheck-python-pylint-executable "python3"
    )
 
-  (use-package pipenv
-    :defer t
-    :config
+  (with-eval-after-load 'pipenv
     (progn
       (setq
        pipenv-projectile-after-switch-function
@@ -697,7 +697,8 @@ you should place you code here."
                 #'(lambda ()
                     (setq flycheck-checker 'python-pylint)
                     (pipenv-mode)))
-      ))
+      )
+    )
 
   (spacemacs|diminish anaconda-mode "🐍" "a")
   ;; Matlab
