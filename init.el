@@ -545,6 +545,30 @@ you should place you code here."
                       (local-set-key (kbd (car pair)) (cdr pair)))))))
     )
 
+  ;; Redeclare eslint checker to not wait for a configuration file
+  (flycheck-define-checker javascript-eslint
+    "A Javascript syntax and style checker using eslint.
+     See URL `https://eslint.org/'."
+    :command ("eslint" "--format=json"
+              (option-list "--rulesdir" flycheck-eslint-rules-directories)
+              (eval flycheck-eslint-args)
+              "--stdin" "--stdin-filename" source-original)
+    :standard-input t
+    :error-parser flycheck-parse-eslint
+    ;; :enabled (lambda () (flycheck-eslint-config-exists-p))
+    :modes (js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode rjsx-mode)
+    :working-directory flycheck-eslint--find-working-directory
+    :verify
+    (lambda (_)
+      (let* ((default-directory
+               (flycheck-compute-working-directory 'javascript-eslint))
+             (have-config (flycheck-eslint-config-exists-p)))
+        (list
+         (flycheck-verification-result-new
+          :label "config file"
+          :message (if have-config "found" "missing or incorrect")
+          :face (if have-config 'success '(bold error)))))))
+
   (add-hook 'scss-mode-hook
             (lambda ()
               (use-linter-from-node-modules
