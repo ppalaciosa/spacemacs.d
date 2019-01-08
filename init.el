@@ -410,8 +410,67 @@ you should place you code here."
    dired-listing-switches "-alh --group-directories-first"
    )
 
+<<<<<<< HEAD
   ;; set-mark bug on emacs 25.1 workaround... in theory
   (require 'ansible-doc)
+=======
+  ;; Gnus
+  (setq gnus-secondary-select-methods
+        '(
+          (nnimap "mkl"
+                  (nnimap-address
+                   "imap.makerlabperu.org")
+                  (nnimap-inbox "INBOX")
+                  (nnimap-server-port "imaps")
+                  (nnimap-server-port 993)
+                  (nnimap-stream ssl)
+                  (nnir-search-engine imap))
+          ))
+
+  (setq gnus-asynchronous t
+        gnus-use-cache t
+        gnus-read-active-file 'some)
+
+  (setq gnus-thread-sort-functions
+        '(gnus-thread-sort-by-most-recent-date
+          (not gnus-thread-sort-by-number)))
+
+  (defun th/message-send-and-exit-multiple (addresses)
+    (interactive (list (split-string (read-string "Adresses: ")
+                                     "," t "[[:space:]]")))
+    (while addresses
+      (let ((address (car addresses)))
+        (setq addresses (cdr addresses))
+        (message-remove-header "To")
+        (message-add-header (format "To: %s" address))
+        (if addresses
+            (message-send)
+          (message-send)))))
+
+  ;; Outbound server
+  (setq message-send-mail-function 'smtpmail-send-it
+        smtpmail-default-smtp-server "smtp.makerlabperu.org")
+
+  (setq gnus-message-archive-method '(nnimap "imap.makerlabperu.org")
+        gnus-message-archive-group "Enviados")
+
+  ;; set return email address based on incoming email address
+  (setq gnus-posting-styles
+        '(((header "to" "wesitos@makerlabperu.org")
+           (address "wesitos@makerlabperu.org"))
+          ((header "to" "admin@makerlabperu.org")
+           (address "admin@makerlabperu.org"))
+          ((header "to" "admision@makerlabperu.org")
+           (address "admision@makerlabperu.org"))))
+
+  (setq nnmh-directory "~/mail/gnus/")
+  (setq message-directory "~/mail/gnus/")
+
+  (add-hook 'gnus-article-mode-hook
+            (lambda ()
+              (face-remap-add-relative 'default :size 16)
+  ))
+>>>>>>> Remove old bug workaround
 
   ;; Avoid calling autocompletion-in-region
   (with-eval-after-load "company"
