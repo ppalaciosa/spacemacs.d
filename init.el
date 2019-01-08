@@ -556,6 +556,7 @@ you should place you code here."
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   (use-package rjsx-mode
     :defer t
     :config
@@ -577,6 +578,9 @@ you should place you code here."
 >>>>>>> e2f2429... Remove mmm-mode related code
 =======
 >>>>>>> Remove mmm-mode related code
+=======
+
+>>>>>>> Remove old variable flycheck-eslintrc
   ;; Web-mode
   (setq-default
    css-indent-offset 2
