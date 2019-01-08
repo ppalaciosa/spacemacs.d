@@ -425,13 +425,11 @@ you should place you code here."
                   (nnimap-server-port 993)
                   (nnimap-stream ssl)
                   (nnir-search-engine imap))
-          ))
-
-  (setq gnus-asynchronous t
+          )
+        gnus-asynchronous t
         gnus-use-cache t
-        gnus-read-active-file 'some)
-
-  (setq gnus-thread-sort-functions
+        gnus-read-active-file 'some
+        gnus-thread-sort-functions
         '(gnus-thread-sort-by-most-recent-date
           (not gnus-thread-sort-by-number)))
 
@@ -449,9 +447,8 @@ you should place you code here."
 
   ;; Outbound server
   (setq message-send-mail-function 'smtpmail-send-it
-        smtpmail-default-smtp-server "smtp.makerlabperu.org")
-
-  (setq gnus-message-archive-method '(nnimap "imap.makerlabperu.org")
+        smtpmail-default-smtp-server "smtp.makerlabperu.org"
+        gnus-message-archive-method '(nnimap "imap.makerlabperu.org")
         gnus-message-archive-group "Enviados")
 
   ;; set return email address based on incoming email address
