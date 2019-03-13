@@ -367,30 +367,46 @@ you should place you code here."
    user-full-name "Pablo Palacios Avila"
    user-mail-address "ppalacios_avila@hotmail.com")
 
+<<<<<<< HEAD
   ;; GPG related options
   (setq
    magit-log-arguments '("--graph" "--decorate" "--show-signature" "-n256")
    )
+=======
+  (spacemacs|diminish holy-mode "✝️" "h")
+
+  (use-package magit
+    :defer 10
+    :config
+    (setq
+     ;; GPG related options
+     magit-commit-arguments '("-S")
+     magit-log-arguments '("--graph" "--decorate" "--show-signature" "-n256")))
+>>>>>>> Some refactoring
 
   ;; Exec-path-from-shell
-  (setq
-   exec-path-from-shell-variables '(
-                                    "PATH"
-                                    "MANPATH"
-                                    "SSH_AUTHSOCK"
-                                    "WORKON_HOME"
-                                    "PYENV_ROOT"
-                                    "PIPENV_DEFAULT_PYTHON_VERSION"
-                                    ))
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
+  (use-package exec-path-from-shell
+    :config
+    (progn
+      (setq
+     exec-path-from-shell-variables
+     '(
+       "PATH"
+       "MANPATH"
+       "SSH_AUTHSOCK"
+       "WORKON_HOME"
+       "PYENV_ROOT"
+       "PIPENV_DEFAULT_PYTHON_VERSION"
+       ))
+      (when (memq window-system '(mac ns x))
+        (exec-path-from-shell-initialize))
+      ))
 
   ;; Mode line
   (setq
    spaceline-battery-p nil
    spaceline-org-clock-p t
-   spaceline-hud-p nil
-   )
+   spaceline-hud-p nil)
   (spacemacs/toggle-mode-line-battery-on)
 
   ;; Company tooltip style
@@ -402,15 +418,16 @@ you should place you code here."
 
   ;; Dired
   ;; Load Dired X when Dired is loaded.
-  (with-eval-after-load 'dired
-    (require 'dired-x)
-    (setq-default dired-omit-files-p t) ; Buffer-local variable
-    (setq
-     dired-omit-files (concat "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\.tern-port$")
-     dired-omit-verbose nil
-     dired-listing-switches "-alh --group-directories-first"
-     )
-    )
+  (use-package dired-x
+    :defer 2
+    :after (dired)
+    :config
+    (progn
+      (setq-default dired-omit-files-p t) ; Buffer-local variable
+      (setq
+       dired-omit-files (concat "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\.tern-port$")
+       dired-omit-verbose nil
+       dired-listing-switches "-alh --group-directories-first")))
 
 <<<<<<< HEAD
   ;; set-mark bug on emacs 25.1 workaround... in theory
@@ -516,44 +533,80 @@ you should place you code here."
 
   ;; Org config
   ;; Fontify org-mode code blocks
-  (setq-default
-   org-src-fontify-natively t
-   ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M--
-   ;; instead to toggle)
-   org-replace-disputed-keys t
-   org-hide-leading-stars t
-   org-odd-levels-only t
-   org-ref-default-bibliography '("references.bib")
-   reftex-default-bibliography '("references.bib")
-   ;; TODO progress logging stuff
-   org-log-done 'time
-   org-export-with-sub-superscripts nil
-   org-latex-listings 'minted
-   org-latex-compiler "xelatex"
-   org-latex-pdf-process'("latexmk -pdf -f -pdflatex='xelatex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
-   org-latex-default-packages-alist '(
-                                      ;; Not used with XeLaTeX
-                                      ("AUTO" "inputenc" t ("pdflatex"))
-                                      ("T1" "fontenc" t ("pdflatex"))
-                                      ("" "fontspec" t ("xelatex"))
-                                      ("" "polyglossia" t ("xelatex"))
-                                      ("" "graphicx" t)
-                                      ("" "grffile" t)
-                                      ("" "longtable" nil)
-                                      ("" "wrapfig" nil)
-                                      ("" "rotating" nil)
-                                      ("normalem" "ulem" t)
-                                      ("" "amsmath" t)
-                                      ("" "textcomp" t)
-                                      ("" "amssymb" t)
-                                      ("" "capt-of" nil)
-                                      ("" "hyperref" nil)
-                                      ("dvipsnames" "xcolor")
-                                      )
-   ;; Agenda and clock
-   org-clock-persist 'history
-   )
+  (use-package org
+    :defer t
+    :init
+    (setq
+       org-src-fontify-natively t
+       ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M--
+       ;; instead to toggle)
+       org-replace-disputed-keys t
+       org-hide-leading-stars t
+       org-odd-levels-only t
+       org-ref-default-bibliography '("references.bib")
+       reftex-default-bibliography '("references.bib")
+       ;; TODO progress logging stuff
+       org-log-done 'time
+       org-export-with-sub-superscripts nil
+       org-latex-listings 'minted
+       org-latex-compiler "xelatex"
+       org-latex-pdf-process'("latexmk -pdf -f -pdflatex='xelatex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
+       org-latex-default-packages-alist '(
+                                          ;; Not used with XeLaTeX
+                                          ("AUTO" "inputenc" t ("pdflatex"))
+                                          ("T1" "fontenc" t ("pdflatex"))
+                                          ("" "fontspec" t ("xelatex"))
+                                          ("" "polyglossia" t ("xelatex"))
+                                          ("" "graphicx" t)
+                                          ("" "grffile" t)
+                                          ("" "longtable" nil)
+                                          ("" "wrapfig" nil)
+                                          ("" "rotating" nil)
+                                          ("normalem" "ulem" t)
+                                          ("" "amsmath" t)
+                                          ("" "textcomp" t)
+                                          ("" "amssymb" t)
+                                          ("" "capt-of" nil)
+                                          ("" "hyperref" nil)
+                                          ("dvipsnames" "xcolor")
+                                          )
+       ;; Agenda and clock
+       org-clock-persist 'history)
+    :config
+    (progn
+      (org-clock-persistence-insinuate)
+      (defun refresh-org-agenda-files ()
+        (interactive)
+        (load-library "find-lisp")
+        (setq org-agenda-files (find-lisp-find-files "~/org/agenda" "\.org$")))
+      (refresh-org-agenda-files)
 
+<<<<<<< HEAD
+=======
+      (add-to-list 'org-latex-packages-alist '("" "minted"))
+      (defun toggle-org-reveal-export-on-save ()
+        (interactive)
+        (if (memq 'org-reveal-export-to-html after-save-hook)
+            (progn
+              (remove-hook 'after-save-hook 'org-reveal-export-to-html t)
+              (message "Disabled org reveal export on save for current buffer..."))
+          (if (memq 'org-reveal-export-current-subtree after-save-hook)
+              (remove-hook 'after-save-hook 'org-reveal-export-current-subtree t))
+          (add-hook 'after-save-hook 'org-reveal-export-to-html nil t)
+          (message "Enabled org reveal export on save for current buffer...")))
+      (defun toggle-org-reveal-export-subtree-on-save ()
+        (interactive)
+        (if (memq 'org-reveal-export-current-subtree after-save-hook)
+            (progn
+              (remove-hook 'after-save-hook 'org-reveal-export-current-subtree t)
+              (message "Disabled org reveal export current subtree on save for current buffer..."))
+          (if (memq 'org-reveal-export-to-html after-save-hook)
+              (remove-hook 'after-save-hook 'org-reveal-export-to-html t))
+          (add-hook 'after-save-hook 'org-reveal-export-current-subtree nil t)
+          (message "Enabled org reveal export current subtree save for current buffer...")))
+      ))
+
+>>>>>>> Some refactoring
   ;; Javascript
   (setq-default
    js2-basic-offset 2
@@ -568,14 +621,18 @@ you should place you code here."
    )
 
   ;; Add .mjs extension autoload
-  (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js2-mode))
-  (add-to-list 'auto-mode-alist '("\\.tern-project\\'" . json-mode))
+  (use-package js2-mode
+    :mode "\\.mjs\\'")
 
-  ;; json-mode by default locally sets indent-level to 4
-  (add-hook 'json-mode-hook
-            (lambda ()
-              (make-local-variable 'js-indent-level)
-              (setq js-indent-level 2)))
+  (use-package json-mode
+    :mode "\\.tern-project\\'"
+    :config
+    ;; json-mode by default locally sets indent-level to 4
+    (add-hook 'json-mode-hook
+              (lambda ()
+                (make-local-variable 'js-indent-level)
+                (setq js-indent-level 2)))
+    )
 
   (advice-add
    'js--multi-line-declaration-indentation
@@ -583,41 +640,30 @@ you should place you code here."
 
   (advice-add 'js--proper-indentation :override 'js--proper-indentation-custom)
 
-  (with-eval-after-load 'js2-mode
-    (use-package js-comint
-      :ensure t
-      :init
-      (progn
-        (defun inferior-js-mode-hook-setup ()
-          (add-hook 'comint-output-filter-functions 'js-comint-process-output))
-        (add-hook 'inferior-js-mode-hook 'inferior-js-mode-hook-setup t)
-        (add-hook 'js2-mode-hook
-                  (lambda ()
-                    (let ((bindlist
-                           '(("C-c c" . 'js-send-last-sexp)
-                             ("C-c C-b" . 'js-send-buffer)
-                             ("C-c C-f" . 'js-load-file))))
-                      (dolist (pair bindlist)
-                        (local-set-key (kbd (car pair)) (cdr pair)))))))
-      )
-    )
+  (use-package js-comint
+    :after (js2-mode)
+    :config
+    (progn
+      (defun inferior-js-mode-hook-setup ()
+        (add-hook 'comint-output-filter-functions 'js-comint-process-output))
+      (add-hook 'inferior-js-mode-hook 'inferior-js-mode-hook-setup t)
+      (add-hook 'js2-mode-hook
+                (lambda ()
+                  (let ((bindlist
+                         '(("C-c c" . 'js-send-last-sexp)
+                           ("C-c C-b" . 'js-send-buffer)
+                           ("C-c C-f" . 'js-load-file))))
+                    (dolist (pair bindlist)
+                      (local-set-key (kbd (car pair)) (cdr pair))))))))
 
   ;; Redeclare eslint checker to not wait for a configuration file
-  (with-eval-after-load 'flycheck
-    (flycheck-define-checker javascript-eslint
-    "A Javascript syntax and style checker using eslint.
-     See URL `https://eslint.org/'."
-    :command ("eslint" "--format=json"
-              (option-list "--rulesdir" flycheck-eslint-rules-directories)
-              (eval flycheck-eslint-args)
-              "--stdin" "--stdin-filename" source-original)
-    :standard-input t
-    :error-parser flycheck-parse-eslint
-    ;; :enabled (lambda () (flycheck-eslint-config-exists-p))
-    :modes (js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode rjsx-mode)
-    :working-directory flycheck-eslint--find-working-directory
-    :verify
-    (lambda (_)
+  ;; We can't use a lambda as the :verify field because of the weird
+  ;; macro expansion made by use-package
+  ;; https://github.com/flycheck/flycheck/issues/594
+  (use-package flycheck
+    :defer 5
+    :preface
+    (defun flycheck-javascript-eslint-verify (_)
       (let* ((default-directory
                (flycheck-compute-working-directory 'javascript-eslint))
              (have-config (flycheck-eslint-config-exists-p)))
@@ -625,18 +671,37 @@ you should place you code here."
          (flycheck-verification-result-new
           :label "config file"
           :message (if have-config "found" "missing or incorrect")
-          :face (if have-config 'success '(bold error)))))))
+          :face (if have-config 'success '(bold error)))))
+      )
+    :config
+    (flycheck-define-checker javascript-eslint
+      "A Javascript syntax and style checker using eslint.
+See URL `https://eslint.org/'."
+      :command ("eslint" "--format=json"
+                (option-list "--rulesdir" flycheck-eslint-rules-directories)
+                (eval flycheck-eslint-args)
+                "--stdin" "--stdin-filename" source-original)
+      :standard-input t
+      :error-parser flycheck-parse-eslint
+      ;; :enabled (lambda () (flycheck-eslint-config-exists-p))
+      :modes (js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode rjsx-mode)
+      :working-directory flycheck-eslint--find-working-directory
+      :verify flycheck-javascript-eslint-verify)
     )
 
-  (add-hook 'scss-mode-hook
-            (lambda ()
-              (use-linter-from-node-modules
-               "sass/scss-sass-lint"
-               "sass-lint/bin/sass-lint.js")))
+  (use-package scss-mode
+    :config
+    (add-hook 'scss-mode-hook
+              (lambda ()
+                (use-linter-from-node-modules
+                 "sass/scss-sass-lint"
+                 "sass-lint/bin/sass-lint.js")))
+    )
 
-  (add-hook 'web-mode-hook 'rainbow-mode)
-  (add-hook 'js2-mode-hook 'rainbow-mode)
+  (use-package rainbow-mode
+    :hook web-mode js2-mode)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -674,13 +739,33 @@ you should place you code here."
    emmet-self-closing-tag-style " /"
    emmet-indentation 2
    )
+=======
+  ;; web-mode
 
-  (with-eval-after-load 'emmet-mode
+  (use-package web-mode
+    :defer t
+    :config
+    (setq
+     web-mode-css-indent-offset 2
+     web-mode-markup-indent-offset 2
+     web-mode-css-indent-offset 2
+     web-mode-code-indent-offset 2
+     web-mode-attr-indent-offset 2)
+    )
+>>>>>>> Some refactoring
+
+  (use-package emmet-mode
+    :defer t
+    :config
     (progn
+      (setq
+       emmet-self-closing-tag-style " /"
+       emmet-indentation 2)
       (unbind-key "<emacs-state> TAB" emmet-mode-keymap)
       (unbind-key "<emacs-state> <tab>" emmet-mode-keymap)))
 
   ;; Python
+<<<<<<< HEAD
   (setq
    python-shell-interpreter "python3"
    flycheck-python-flake8-executable "python3"
@@ -688,53 +773,69 @@ you should place you code here."
    )
 
   (with-eval-after-load 'pipenv
+=======
+  (use-package python
+    :defer t
+    :config
     (progn
       (setq
-       pipenv-projectile-after-switch-function
-       #'pipenv-projectile-after-switch-extended)
+       flycheck-python-flake8-executable "python3"
+       flycheck-python-pylint-executable "python3"
+       )
+      (spacemacs|diminish anaconda-mode "🐍" "a"))
+    )
+  (use-package pipenv
+    :defer t
+    :config
+>>>>>>> Some refactoring
+    (progn
+      (setq
+       pipenv-with-flycheck t
+       pipenv-with-projectile t)
+      (setq pipenv-projectile-after-switch-function
+            #'pipenv-projectile-after-switch-extended)
       (spacemacs|diminish pipenv-mode "🎁" "p")
       (add-hook 'python-mode-hook
                 #'(lambda ()
                     (setq flycheck-checker 'python-pylint)
-                    (pipenv-mode)))
-      )
-    )
+                    (pipenv-mode)))))
 
-  (spacemacs|diminish anaconda-mode "🐍" "a")
   ;; Matlab
-  (setq-default
-   pipenv-with-flycheck t
-   pipenv-with-projectile t
-   matlab-shell-command-switches '("-nodesktop" "-nosplash")
-   )
+  (use-package matlab
+    :defer t
+    :config
+    (setq
+     matlab-shell-command-switches '("-nodesktop" "-nosplash")))
 
   ;; Latex
   (add-hook 'LaTeX-mode-hook 'visual-line-mode)
 
   ;; Expand Region
-  (setq-default
-   expand-region-fast-keys-enabled nil
-   )
+  (use-package expand-region
+    :bind ("C-\\" . er/expand-region)
+    :config
+    (setq expand-region-fast-keys-enabled nil)
+    )
 
   ;; Smart parens global mode
   (spacemacs/toggle-smartparens-globally-on)
 
   ;; ------Smart parens bindings------
-  ;; Delete
-  (define-key sp-keymap (kbd "C-k") 'sp-kill-hybrid-sexp)
-  (define-key sp-keymap (kbd "M-<backspace>") 'sp-backward-unwrap-sexp)
-  (define-key sp-keymap (kbd "C-M-<backspace>") 'sp-splice-sexp-killing-backward)
-  (define-key sp-keymap (kbd "C-M-f") 'sp-forward-sexp)
-  (define-key sp-keymap (kbd "C-M-b") 'sp-backward-sexp)
-  (define-key sp-keymap (kbd "C-M-d") 'sp-down-sexp)
-  (define-key sp-keymap (kbd "C-M-a") 'sp-beginning-of-sexp)
-  (define-key sp-keymap (kbd "C-M-e") 'sp-up-sexp)
-  ;; Move parens
-  (define-key sp-keymap (kbd "<C-right>") 'sp-forward-slurp-sexp)
-  (define-key sp-keymap (kbd "<C-left>") 'sp-backward-slurp-sexp)
+  (use-package smartparens
+    :bind (:map sp-keymap
+                ("C-k" . sp-kill-hybrid-sexp)
+                ("M-<backspace>" .  sp-backward-unwrap-sexp)
+                ("C-M-<backspace>" . sp-splice-sexp-killing-backward)
+                ("C-M-f" . sp-forward-sexp)
+                ("C-M-b" . sp-backward-sexp)
+                ("C-M-d" . sp-down-sexp)
+                ("C-M-a" . sp-beginning-of-sexp)
+                ("C-M-e" . sp-up-sexp)
+                ("<C-right>" . sp-forward-slurp-sexp)
+                ("<C-left>" . sp-backward-slurp-sexp)
+                ))
 
-  ;; Expand region binding
-  (global-set-key (kbd "C-\\") 'er/expand-region)
+
   ;; Mark paragraph
   (global-set-key (kbd "M-h") 'mark-paragraph)
   ;; <menu> key
@@ -753,9 +854,21 @@ you should place you code here."
   ;; Prevent madness
   (delete-selection-mode t)
 
+<<<<<<< HEAD
   (spacemacs|diminish wakatime-mode "🕑" "w")
+=======
+  ;; Wakatime
+  (use-package wakatime-mode
+    :config
+    (progn
+      (setq
+       wakatime-cli-path "~/.pyenv/shims/wakatime"
+       wakatime-python-bin nil
+       )
+      (spacemacs|diminish wakatime-mode "🕑" "w")
+      (global-wakatime-mode t)))
+>>>>>>> Some refactoring
 
-  (spacemacs|diminish holy-mode "✝️" "h")
   (setq
    safe-local-variable-values
    '(
