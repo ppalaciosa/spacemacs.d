@@ -23,11 +23,10 @@ values."
      (auto-completion :variables
                       auto-completion-return-key-behavior nil
                       auto-completion-tab-key-behavior 'complete
-                      auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-help-tooltip t
-                      auto-completion-complete-with-key-sequence-delay 0.1
                       auto-completion-enable-sort-by-usage t)
-     syntax-checking
+     (syntax-checking :variables
+                      syntax-checking-enable-tooltips nil)
      (spell-checking :variables
                      spell-checking-enable-by-default nil
                      enable-flyspell-auto-completion nil)
@@ -45,7 +44,7 @@ values."
       :variables javascript-backend 'tern
       node-add-modules-path t)
      (tern :variables tern-disable-port-files nil)
-     python
+     (python :variables python-backend 'anaconda)
      ruby
      (sql :variables sql-capitalize-keywords t)
 
@@ -53,7 +52,6 @@ values."
      markdown
      yaml
      csv
-     raml
 
      ;; Bring order to life
      (org :variables org-enable-reveal-js-support t)
@@ -393,6 +391,13 @@ you should place you code here."
    )
   (spacemacs/toggle-mode-line-battery-on)
 
+  ;; Company tooltip style
+  (custom-set-faces
+   '(company-tooltip-common
+     ((t (:inherit company-tooltip :weight bold :underline nil))))
+   '(company-tooltip-common-selection
+     ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
+
   ;; Dired
   ;; Load Dired X when Dired is loaded.
   (require 'dired-x)
@@ -422,6 +427,7 @@ you should place you code here."
                   )
     (ispell-set-spellchecker-params)
     (ispell-hunspell-add-multi-dic "castellano,english"))
+
 
   ;; File lookup
   (use-package helm
