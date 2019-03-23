@@ -367,12 +367,6 @@ you should place you code here."
    user-full-name "Pablo Palacios Avila"
    user-mail-address "ppalacios_avila@hotmail.com")
 
-<<<<<<< HEAD
-  ;; GPG related options
-  (setq
-   magit-log-arguments '("--graph" "--decorate" "--show-signature" "-n256")
-   )
-=======
   (spacemacs|diminish holy-mode "✝️" "h")
 
   (use-package magit
@@ -382,7 +376,6 @@ you should place you code here."
      ;; GPG related options
      magit-commit-arguments '("-S")
      magit-log-arguments '("--graph" "--decorate" "--show-signature" "-n256")))
->>>>>>> Some refactoring
 
   ;; Exec-path-from-shell
   (use-package exec-path-from-shell
@@ -429,10 +422,6 @@ you should place you code here."
        dired-omit-verbose nil
        dired-listing-switches "-alh --group-directories-first")))
 
-<<<<<<< HEAD
-  ;; set-mark bug on emacs 25.1 workaround... in theory
-  (require 'ansible-doc)
-=======
   ;; Gnus
   (setq gnus-secondary-select-methods
         '(
@@ -486,7 +475,6 @@ you should place you code here."
             (lambda ()
               (face-remap-add-relative 'default :size 16)
   ))
->>>>>>> Remove old bug workaround
 
   ;; Avoid calling autocompletion-in-region
   (with-eval-after-load "company"
@@ -581,8 +569,7 @@ you should place you code here."
         (setq org-agenda-files (find-lisp-find-files "~/org/agenda" "\.org$")))
       (refresh-org-agenda-files)
 
-<<<<<<< HEAD
-=======
+
       (add-to-list 'org-latex-packages-alist '("" "minted"))
       (defun toggle-org-reveal-export-on-save ()
         (interactive)
@@ -606,7 +593,6 @@ you should place you code here."
           (message "Enabled org reveal export current subtree save for current buffer...")))
       ))
 
->>>>>>> Some refactoring
   ;; Javascript
   (setq-default
    js2-basic-offset 2
@@ -701,45 +687,6 @@ See URL `https://eslint.org/'."
   (use-package rainbow-mode
     :hook web-mode js2-mode)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  (use-package rjsx-mode
-    :defer t
-    :config
-    (require 'mmm-mode)
-    )
-
-  ;; GraphQL
-  (use-package graphql-mode
-    :ensure t
-    :mode "\\.graphql\\'"
-    :init
-    (spacemacs|diminish graphql-mode "⬡" "g")
-    )
-
-  (setq-default
-   flycheck-eslintrc ".eslintrc*")
-
-=======
->>>>>>> e2f2429... Remove mmm-mode related code
-=======
->>>>>>> Remove mmm-mode related code
-=======
-
->>>>>>> Remove old variable flycheck-eslintrc
-  ;; Web-mode
-  (setq-default
-   css-indent-offset 2
-   web-mode-markup-indent-offset 2
-   web-mode-css-indent-offset 2
-   web-mode-code-indent-offset 2
-   web-mode-attr-indent-offset 2
-   emmet-self-closing-tag-style " /"
-   emmet-indentation 2
-   )
-=======
   ;; web-mode
 
   (use-package web-mode
@@ -752,7 +699,6 @@ See URL `https://eslint.org/'."
      web-mode-code-indent-offset 2
      web-mode-attr-indent-offset 2)
     )
->>>>>>> Some refactoring
 
   (use-package emmet-mode
     :defer t
@@ -765,15 +711,6 @@ See URL `https://eslint.org/'."
       (unbind-key "<emacs-state> <tab>" emmet-mode-keymap)))
 
   ;; Python
-<<<<<<< HEAD
-  (setq
-   python-shell-interpreter "python3"
-   flycheck-python-flake8-executable "python3"
-   flycheck-python-pylint-executable "python3"
-   )
-
-  (with-eval-after-load 'pipenv
-=======
   (use-package python
     :defer t
     :config
@@ -787,7 +724,6 @@ See URL `https://eslint.org/'."
   (use-package pipenv
     :defer t
     :config
->>>>>>> Some refactoring
     (progn
       (setq
        pipenv-with-flycheck t
@@ -854,9 +790,6 @@ See URL `https://eslint.org/'."
   ;; Prevent madness
   (delete-selection-mode t)
 
-<<<<<<< HEAD
-  (spacemacs|diminish wakatime-mode "🕑" "w")
-=======
   ;; Wakatime
   (use-package wakatime-mode
     :config
@@ -867,7 +800,6 @@ See URL `https://eslint.org/'."
        )
       (spacemacs|diminish wakatime-mode "🕑" "w")
       (global-wakatime-mode t)))
->>>>>>> Some refactoring
 
   (setq
    safe-local-variable-values
