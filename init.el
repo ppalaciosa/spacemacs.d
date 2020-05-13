@@ -40,8 +40,7 @@ values."
      clojure
      emacs-lisp
      major-modes
-     (javascript
-      :variables
+     (javascript :variables
       js2-basic-offset 2
       javascript-backend 'tern
       node-add-modules-path t)
@@ -49,6 +48,14 @@ values."
      (python :variables python-backend 'anaconda)
      ruby
      (sql :variables sql-capitalize-keywords t)
+
+
+     ;; JS Tide layer
+     (javascript :variables
+                 javascript-backend 'tide)
+
+     (typescript :variables
+                 typescript-backend 'tide)
 
      ;; Non-programming languages
      markdown
