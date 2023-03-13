@@ -797,17 +797,6 @@ See URL `https://eslint.org/'."
   ;; Prevent madness
   (delete-selection-mode t)
 
-  ;; Wakatime
-  (use-package wakatime-mode
-    :config
-    (progn
-      (setq
-       wakatime-cli-path "~/.pyenv/shims/wakatime"
-       wakatime-python-bin nil
-       )
-      (spacemacs|diminish wakatime-mode "🕑" "w")
-      (global-wakatime-mode t)))
-
   (setq
    safe-local-variable-values
    '(
