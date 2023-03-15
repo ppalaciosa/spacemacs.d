@@ -36,34 +36,41 @@ values."
 
      ;; Programming Languages
      (c-c++ :variables
-            c-c++-default-mode-for-headers 'c++-mode)
+            c-c++-backend 'rtags
+            c-c++-default-mode-for-headers 'c++-mode )
+     (javascript :variables
+                 js2-basic-offset 2
+                 js-indent-level 2
+                 js-switch-indent-offset 2
+                 js-expr-indent-offset 0
+                 js-paren-indent-offset 0
+                 js2-mode-assume-strict t
+                 js2-mode-show-strict-warnings nil
+                 js2-mode-show-parse-errors nil
+                 javascript-import-tool 'import-js
+                 javascript-backend 'tide
+                 javascript-fmt-tool 'prettier
+                 node-add-modules-path t)
+     (typescript :variables
+                 typescript-backend 'tide
+                 typescript-linter 'eslint
+                 typescript-fmt-tool 'prettier)
+
      clojure
      emacs-lisp
      major-modes
-     (javascript :variables
-      js2-basic-offset 2
-      javascript-backend 'tern
-      node-add-modules-path t)
-     (tern :variables tern-disable-port-files nil)
      (python :variables python-backend 'anaconda)
      ruby
      (sql :variables sql-capitalize-keywords t)
 
-
-     ;; JS Tide layer
-     (javascript :variables
-                 javascript-backend 'tide)
-
-     (typescript :variables
-                 typescript-backend 'tide)
-
      ;; Non-programming languages
-     markdown
-     yaml
+     (markdown :variables markdown-live-preview-engine 'vmd)
+     (yaml :variables yaml-enable-lsp t)
      csv
 
      ;; Bring order to life
      (org :variables org-enable-reveal-js-support t)
+ 
      ;; Documents
      latex
      bibtex
@@ -79,6 +86,7 @@ values."
      platformio
      ipython-notebook
      ansible
+     
      docker
      git
      systemd
@@ -87,23 +95,35 @@ values."
      ;; fun stuff
      xkcd
      spotify
-
-     ;; spell-checking
-     ;; version-control
      )
-   ;; List of additional packages that will be installed without being
-   ;; wrapped in a layer. If you need some configuration for these
-   ;; packages, then consider creating a layer. You can also put the
-   ;; configuration in `dotspacemacs/user-config'.
+   ;; List of additional packages that will be installed without being wrapped
+   ;; in a layer (generally the packages are installed only and should still be
+   ;; loaded using load/require/use-package in the user-config section below in
+   ;; this file). If you need some configuration for these packages, then
+   ;; consider creating a layer. You can also put the configuration in
+   ;; `dotspacemacs/user-config'. To use a local version of a package, use the
+   ;; `:location' property: '(your-package :location "~/path/to/your-package/")
+   ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages
    '(
-     js-comint
+     add-node-modules-path
      editorconfig
      graphql-mode
-     (yasnippet :location elpa)
+     ;; (yasnippet :location elpa)
      gnus-desktop-notify
      exec-path-from-shell
+     polymode
+     poly-markdown
+     poly-ansible
+     poly-org
+     god-mode
+     nvm
+     pydoc
+     ztree
+     hcl-mode
+     orgtbl-aggregate
      )
+
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages and/or extensions that will not be install and loaded.
