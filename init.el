@@ -396,31 +396,87 @@ you should place you code here."
 
   (spacemacs|diminish holy-mode "✝️" "h")
 
-  (use-package magit
-    :defer 10
-    :config
-    (setq
-     ;; GPG related options
-     magit-commit-arguments '("-S")
-     magit-log-arguments '("--graph" "--decorate" "--show-signature" "-n256")))
-
-  ;; Exec-path-from-shell
-  (use-package exec-path-from-shell
+  ;; God-mode https://github.com/emacsorphanage/god-mode
+  (use-package god-mode
+    :bind ("<f28>" . god-mode-all)
     :config
     (progn
       (setq
-     exec-path-from-shell-variables
-     '(
-       "PATH"
-       "MANPATH"
-       "SSH_AUTHSOCK"
-       "WORKON_HOME"
-       "PYENV_ROOT"
-       "PIPENV_DEFAULT_PYTHON_VERSION"
-       ))
-      (when (memq window-system '(mac ns x))
+       god-exempt-major-modes nil
+       god-exempt-predicates nil)
+      (defun god-mode-update-cursor ()
+        (setq cursor-type
+              (if (or god-local-mode buffer-read-only)
+                  'box 'bar))
+        (let* (
+               (background-god '("red4" "white"))
+               (background-godless '("base" "base"))
+               (background
+                (if god-local-mode background-god background-godless)))
+          (set-face-background 'mode-line (car background))
+          (set-face-foreground 'mode-line (cadr background))))
+      (spacemacs|diminish god-local-mode "🗲" "g")
+      (add-hook 'god-mode-enabled-hook 'god-mode-update-cursor)
+      (add-hook 'god-mode-disabled-hook 'god-mode-update-cursor)))
+
+  ;; Add lisp folder to load-path
+  (add-to-list 'load-path (expand-file-name "lisp/" dotspacemacs-directory))
+
+  (setq native-comp-async-report-warnings-errors nil)
+
+  ;; Mac special keys stuff
+  ;;
+  ;; Combine this with swaping the option and command keys (at the OS level)
+  ;; when using an external keyboard
+  (when (eq system-type 'darwin)
+    (setq mac-option-modifier 'alt)
+    (setq mac-command-modifier 'meta)
+    (global-set-key [kp-delete] 'delete-char)
+    )
+
+
+  (use-package transient
+    ;; What magit uses to persist commands parameters
+    :defer 10
+    :init
+    (setq-default
+     transient-values-file "~/.spacemacs.d/transient/values.el"
+     transient-levels-file "~/.spacemacs.d/transient/levels.el"
+     transient-history-file "~/.spacemacs.d/transient/history.el"
+     ))
+
+  (use-package magit
+    :defer t
+    :init
+    (setq
+     vc-handled-backends (delq 'Git vc-handled-backends)
+     ))
+
+  ;; Exec-path-from-shell
+  (use-package exec-path-from-shell
+    :defer nil
+    :config
+    (progn
+      (setq
+       exec-path-from-shell-variables
+       '(
+         "PATH"
+         "MANPATH"
+         "SSH_AUTH_SOCK"
+         "WORKON_HOME"
+         "PYENV_ROOT"
+         "PIPENV_DEFAULT_PYTHON_VERSION"
+         ))
+      (when (or (daemonp) (memq window-system '(mac ns x)))
         (exec-path-from-shell-initialize))
       ))
+
+  (spacemacs|define-custom-layout "@dotfiles"
+    :binding "d"
+    :body
+    (progn
+      ;; hook to add all ERC buffers to the layout
+      (find-file (expand-file-name "~/dotfiles/Readme.org"))))
 
   ;; Mode line
   (setq
@@ -428,13 +484,6 @@ you should place you code here."
    spaceline-org-clock-p t
    spaceline-hud-p nil)
   (spacemacs/toggle-mode-line-battery-on)
-
-  ;; Company tooltip style
-  (custom-set-faces
-   '(company-tooltip-common
-     ((t (:inherit company-tooltip :weight bold :underline nil))))
-   '(company-tooltip-common-selection
-     ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
 
   ;; Dired
   ;; Load Dired X when Dired is loaded.
@@ -444,6 +493,10 @@ you should place you code here."
     :config
     (progn
       (setq-default dired-omit-files-p t) ; Buffer-local variable
+      (when (eq system-type 'darwin)
+        (setq
+         insert-directory-program "gls"
+         dired-use-ls-dired t))
       (setq
        dired-omit-files (concat "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\.tern-port$")
        dired-omit-verbose nil
