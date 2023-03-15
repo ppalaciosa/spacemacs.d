@@ -11,6 +11,22 @@ values."
    ;; `+distribution'. For now available distributions are `spacemacs-base'
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
+
+   ;; Lazy installation of layers (i.e. layers are installed only when a file
+   ;; with a supported type is opened). Possible values are `all', `unused'
+   ;; and `nil'. `unused' will lazy install only unused layers (i.e. layers
+   ;; not listed in variable `dotspacemacs-configuration-layers'), `all' will
+   ;; lazy install any layer that support lazy installation even the layers
+   ;; listed in `dotspacemacs-configuration-layers'. `nil' disable the lazy
+   ;; installation feature and you have to explicitly list a layer in the
+   ;; variable `dotspacemacs-configuration-layers' to install it.
+   ;; (default 'unused)
+   dotspacemacs-enable-lazy-installation 'unused
+
+   ;; If non-nil then Spacemacs will ask for confirmation before installing
+   ;; a layer lazily. (default t)
+   dotspacemacs-ask-for-lazy-installation t
+
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '("~/.spacemacs.d/private/")
@@ -21,18 +37,19 @@ values."
      better-defaults
      helm
      (auto-completion :variables
-                      auto-completion-return-key-behavior nil
-                      auto-completion-tab-key-behavior 'complete
+                      auto-completion-return-key-behavior 'complete
+                      auto-completion-tab-key-behavior 'cycle
+                      auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-help-tooltip t
-                      auto-completion-enable-sort-by-usage t)
-     (syntax-checking :variables
-                      syntax-checking-enable-tooltips nil)
+                      auto-completion-idle-delay 0.1
+                      )
+     syntax-checking
      (spell-checking :variables
                      spell-checking-enable-by-default nil
                      enable-flyspell-auto-completion nil)
-     better-defaults
      (colors :variables
              colors-enable-rainbow-identifiers t)
+
 
      ;; Programming Languages
      (c-c++ :variables
@@ -800,8 +817,6 @@ you should place you code here."
 
   ;; Mark paragraph
   (global-set-key (kbd "M-h") 'mark-paragraph)
-  ;; <menu> key
-  (global-set-key (kbd "<menu>") 'helm-M-x)
   ;; prevent madness
   (global-set-key (kbd "C-x 2")
                   (lambda ()
@@ -813,8 +828,13 @@ you should place you code here."
                     (interactive)
                     (split-window-horizontally)
                     (other-window 1)))
-  ;; Prevent madness
   (delete-selection-mode t)
+
+
+  ;; Yaml
+  (use-package yaml-mode
+    :config (setq-default yaml-indent-offset 2))
+
 
   (setq
    safe-local-variable-values
@@ -828,69 +848,4 @@ you should place you code here."
      (ispell-dictionary . "castellano")
      (ispell-dictionary . "english")))
   )
-
-(defun js--proper-indentation-custom (parse-status)
-  "Return the proper indentation for the current line."
-  (save-excursion
-    (back-to-indentation)
-    (cond ((nth 4 parse-status)    ; inside comment
-           (js--get-c-offset 'c (nth 8 parse-status)))
-          ((nth 3 parse-status) 0) ; inside string
-          ((eq (char-after) ?#) 0)
-          ((save-excursion (js--beginning-of-macro)) 4)
-          ;; Indent array comprehension continuation lines specially.
-          ((let ((bracket (nth 1 parse-status))
-                 beg)
-             (and bracket
-                  (not (js--same-line bracket))
-                  (setq beg (js--indent-in-array-comp bracket))
-                  ;; At or after the first loop?
-                  (>= (point) beg)
-                  (js--array-comp-indentation bracket beg))))
-          ((js--ctrl-statement-indentation))
-          ((nth 1 parse-status)
-           ;; A single closing paren/bracket should be indented at the
-           ;; same level as the opening statement. Same goes for
-           ;; "case" and "default".
-           (let ((same-indent-p (looking-at "[]})]"))
-                 (switch-keyword-p (looking-at "default\\_>\\|case\\_>[^:]"))
-                 (continued-expr-p (js--continued-expression-p))
-                 (original-point (point))
-                 (open-symbol (nth 1 parse-status)))
-             (goto-char (nth 1 parse-status)) ; go to the opening char
-             (skip-syntax-backward " ")
-             (when (eq (char-before) ?\)) (backward-list))
-             (back-to-indentation)
-             (js--maybe-goto-declaration-keyword-end parse-status)
-             (let* ((in-switch-p (unless same-indent-p
-                                   (looking-at "\\_<switch\\_>")))
-                    (same-indent-p (or same-indent-p
-                                       (and switch-keyword-p
-                                            in-switch-p)))
-                    (indent
-                     (cond (same-indent-p
-                            (current-column))
-                           (continued-expr-p
-                            (goto-char original-point)
-                            ;; Go to beginning line of continued expression.
-                            (while (js--continued-expression-p)
-                              (forward-line -1))
-                            ;; Go to the open symbol if it appears later.
-                            (when (> open-symbol (point))
-                              (goto-char open-symbol))
-                            (back-to-indentation)
-                            (+ (current-column)
-                               js-indent-level
-                               js-expr-indent-offset))
-                           (t
-                            (+ (current-column) js-indent-level
-                               (pcase (char-after (nth 1 parse-status))
-                                 (?\( js-paren-indent-offset)
-                                 (?\[ js-square-indent-offset)
-                                 (?\{ js-curly-indent-offset)))))))
-               (if in-switch-p
-                   (+ indent js-switch-indent-offset)
-                 indent))))
-          ((js--continued-expression-p)
-           (+ js-indent-level js-expr-indent-offset))
-          (t 0))))
+  
