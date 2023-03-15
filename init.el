@@ -83,6 +83,7 @@ values."
      nginx
 
      ;; Tools
+     tide
      platformio
      ipython-notebook
      ansible
@@ -556,7 +557,7 @@ you should place you code here."
   (use-package org
     :defer t
     :init
-    (setq
+    (setq-default
        org-src-fontify-natively t
        ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M--
        ;; instead to toggle)
@@ -589,9 +590,11 @@ you should place you code here."
                                           ("" "capt-of" nil)
                                           ("" "hyperref" nil)
                                           ("dvipsnames" "xcolor")
+                                          ("" "minted")
                                           )
-       ;; Agenda and clock
-       org-clock-persist 'history)
+
+    ;; Agenda and clock
+    org-clock-persist 'history)
     :config
     (progn
       (org-clock-persistence-insinuate)
@@ -601,8 +604,8 @@ you should place you code here."
         (setq org-agenda-files (find-lisp-find-files "~/org/agenda" "\.org$")))
       (refresh-org-agenda-files)
 
-
       (add-to-list 'org-latex-packages-alist '("" "minted"))
+      
       (defun toggle-org-reveal-export-on-save ()
         (interactive)
         (if (memq 'org-reveal-export-to-html after-save-hook)
@@ -626,21 +629,26 @@ you should place you code here."
       ))
 
   ;; Javascript
-  (setq-default
-   js2-basic-offset 2
-   js-indent-level 2
-   js2-mode-assume-strict t
-   js-switch-indent-offset 2
-   js2-mode-show-strict-warnings nil
-   js2-mode-show-parse-errors nil
-   js-expr-indent-offset 0
-   js-paren-indent-offset 0
-   json-reformat:indent-width 2
-   )
+
+  (use-package js-mode
+    :defer t
+    :config
+    (advice-add 'js--multi-line-declaration-indentation :around (lambda (orig-fun &rest args) nil)))
 
   ;; Add .mjs extension autoload
   (use-package js2-mode
-    :mode "\\.mjs\\'")
+    :mode "\\.\\(mjs\\|cjs\\)\\'")
+
+  (use-package json-reformat
+    :defer t
+    :config
+    (setq-default
+     json-reformat:indent-width 2))
+
+  (use-package tide
+    :defer t
+    :config
+    (setq tide-disable-suggestions t))
 
   (use-package json-mode
     :mode "\\.tern-project\\'"
@@ -652,60 +660,33 @@ you should place you code here."
                 (setq js-indent-level 2)))
     )
 
-  (advice-add
-   'js--multi-line-declaration-indentation
-   :around (lambda (orig-fun &rest args) nil))
+  ;; Workaround for eslint loading slow
+  ;; A side effect is that eslint will always "detect" a config file
+  ;; https://github.com/flycheck/flycheck/issues/1129
+   (use-package flycheck
+    :custom
+    (flycheck-display-errors-delay 0.5)
+    :config
+    ;; eslint_d makes this optimization unnecessary
+    (let ((has-eslint-d (locate-file "eslint_d" exec-path)))
+      (if has-eslint-d
+          (setq-default
+           flycheck-javascript-eslint-executable "eslint_d")
+        (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t))))
+    (flycheck-add-mode 'javascript-eslint 'typescript-tsx-mode)
+    )
 
-  (advice-add 'js--proper-indentation :override 'js--proper-indentation-custom)
-
-  (use-package js-comint
-    :after (js2-mode)
+  (use-package graphql-mode
+    :defer t
     :config
     (progn
-      (defun inferior-js-mode-hook-setup ()
-        (add-hook 'comint-output-filter-functions 'js-comint-process-output))
-      (add-hook 'inferior-js-mode-hook 'inferior-js-mode-hook-setup t)
-      (add-hook 'js2-mode-hook
-                (lambda ()
-                  (let ((bindlist
-                         '(("C-c c" . 'js-send-last-sexp)
-                           ("C-c C-b" . 'js-send-buffer)
-                           ("C-c C-f" . 'js-load-file))))
-                    (dolist (pair bindlist)
-                      (local-set-key (kbd (car pair)) (cdr pair))))))))
-
-  ;; Redeclare eslint checker to not wait for a configuration file
-  ;; We can't use a lambda as the :verify field because of the weird
-  ;; macro expansion made by use-package
-  ;; https://github.com/flycheck/flycheck/issues/594
-  (use-package flycheck
-    :defer 5
-    :preface
-    (defun flycheck-javascript-eslint-verify (_)
-      (let* ((default-directory
-               (flycheck-compute-working-directory 'javascript-eslint))
-             (have-config (flycheck-eslint-config-exists-p)))
-        (list
-         (flycheck-verification-result-new
-          :label "config file"
-          :message (if have-config "found" "missing or incorrect")
-          :face (if have-config 'success '(bold error)))))
-      )
-    :config
-    (flycheck-define-checker javascript-eslint
-      "A Javascript syntax and style checker using eslint.
-See URL `https://eslint.org/'."
-      :command ("eslint" "--format=json"
-                (option-list "--rulesdir" flycheck-eslint-rules-directories)
-                (eval flycheck-eslint-args)
-                "--stdin" "--stdin-filename" source-original)
-      :standard-input t
-      :error-parser flycheck-parse-eslint
-      ;; :enabled (lambda () (flycheck-eslint-config-exists-p))
-      :modes (js-mode js-jsx-mode js2-mode js2-jsx-mode js3-mode rjsx-mode)
-      :working-directory flycheck-eslint--find-working-directory
-      :verify flycheck-javascript-eslint-verify)
-    )
+      (unless (member "union" graphql-keywords)
+        (add-to-list 'graphql-keywords "union"))
+      (setq
+       graphql-definition-regex
+       (concat "\\(" (regexp-opt '("type" "input" "interface" "fragment" "query"
+                                   "mutation" "subscription" "enum" "union")) "\\)"
+                                   "[[:space:]]+\\(\\_<.+?\\_>\\)"))))
 
   (use-package scss-mode
     :config
@@ -716,21 +697,22 @@ See URL `https://eslint.org/'."
                  "sass-lint/bin/sass-lint.js")))
     )
 
-  (use-package rainbow-mode
-    :hook web-mode js2-mode)
-
   ;; web-mode
-
   (use-package web-mode
     :defer t
-    :config
-    (setq
-     web-mode-css-indent-offset 2
+    :init
+    (setq-default
      web-mode-markup-indent-offset 2
      web-mode-css-indent-offset 2
      web-mode-code-indent-offset 2
      web-mode-attr-indent-offset 2)
+    (add-hook 'web-mode-hook #'turn-on-smartparens-mode t)
+    :config
+
     )
+    
+  (use-package rainbow-mode
+    :hook web-mode js2-mode)
 
   (use-package emmet-mode
     :defer t
@@ -778,7 +760,7 @@ See URL `https://eslint.org/'."
     :defer t
     :config
     (setq-default pythonic-interpreter "python"))
-2
+
 
   ;; Matlab
   (use-package matlab
