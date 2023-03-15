@@ -720,16 +720,17 @@ See URL `https://eslint.org/'."
   ;; Python
   (use-package python
     :defer t
-    :config
+    :init
     (progn
-      (setq
-       flycheck-python-flake8-executable "python3"
-       flycheck-python-pylint-executable "python3"
+      (spacemacs|diminish anaconda-mode "🐍" "a")
+      (setq-default
+       python-shell-interpreter "ipython"
+       python-shell-interpreter-args "--simple-prompt -i"
        )
-      (spacemacs|diminish anaconda-mode "🐍" "a"))
+      )
     )
   (use-package pipenv
-    :defer t
+    :after (python)
     :config
     (progn
       (setq
@@ -742,6 +743,17 @@ See URL `https://eslint.org/'."
                 #'(lambda ()
                     (setq flycheck-checker 'python-pylint)
                     (pipenv-mode)))))
+
+  (use-package importmagic
+    :defer t
+    :config
+    (setq-default importmagic-python-interpreter "python"))
+
+  (use-package pythonic
+    :defer t
+    :config
+    (setq-default pythonic-interpreter "python"))
+2
 
   ;; Matlab
   (use-package matlab
