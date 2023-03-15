@@ -491,15 +491,21 @@ you should place you code here."
       (kbd "<tab>") 'company-indent-or-complete-common)
     )
 
-
   ;; Ispell config
-  (with-eval-after-load "ispell"
-    (setq-default ispell-program-name "hunspell"
-                  ispell-dictionary "castellano,english"
-                  )
-    (ispell-set-spellchecker-params)
-    (ispell-hunspell-add-multi-dic "castellano,english"))
+  (when (eq system-type 'gnu/linux)
+    (with-eval-after-load "ispell"
+      (when (executable-find "hunspell")
+        (setq ispell-program-name "hunspell"
+              ispell-local-dictionary "en_US"
+              ispell-local-dictionary-alist
+              '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+        (ispell-set-spellchecker-params)
+        (ispell-hunspell-add-multi-dic "es_PE,en_US")
+        (setq ispell-dictionary "es_PE,en_US"))
+      )
+    )
 
+  (list-load-path-shadows)
 
   ;; File lookup
   (use-package helm
@@ -821,7 +827,6 @@ See URL `https://eslint.org/'."
      (ispell-dictionary . "castellano")
      (ispell-dictionary . "english")))
   )
-
 
 (defun js--proper-indentation-custom (parse-status)
   "Return the proper indentation for the current line."
