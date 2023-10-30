@@ -587,8 +587,10 @@ you should place you code here."
        org-log-done 'time
        org-export-with-sub-superscripts nil
        org-latex-listings 'minted
+       TeX-engine 'xetex
+       TeX-PDF-mode t
        org-latex-compiler "xelatex"
-       org-latex-pdf-process'("latexmk -pdf -f -pdflatex='xelatex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
+       org-latex-pdf-process'("latexmk -pdf -f -pdflatex='%latex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
        org-latex-default-packages-alist '(
                                           ;; Not used with XeLaTeX
                                           ("AUTO" "inputenc" t ("pdflatex"))
