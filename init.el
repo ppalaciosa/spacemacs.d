@@ -21,7 +21,7 @@ values."
    ;; installation feature and you have to explicitly list a layer in the
    ;; variable `dotspacemacs-configuration-layers' to install it.
    ;; (default 'unused)
-   dotspacemacs-enable-lazy-installation 'unused
+   dotspacemacs-enable-lazy-installation nil
 
    ;; If non-nil then Spacemacs will ask for confirmation before installing
    ;; a layer lazily. (default t)
@@ -42,6 +42,8 @@ values."
                       auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-help-tooltip t
                       auto-completion-idle-delay 0.1
+                      auto-completion-minimum-prefix-length 1
+                      auto-completion-use-company-box t
                       )
      syntax-checking
      (spell-checking :variables
@@ -50,8 +52,7 @@ values."
      (colors :variables
              colors-enable-rainbow-identifiers t)
 
-
-     ;; Programming Languages
+;; Programming Languages
      (c-c++ :variables
             c-c++-backend 'rtags
             c-c++-default-mode-for-headers 'c++-mode )
@@ -66,19 +67,25 @@ values."
                  js2-mode-show-parse-errors nil
                  javascript-import-tool 'import-js
                  javascript-backend 'tide
+                 javascript-lsp-linter nil
                  javascript-fmt-tool 'prettier
                  node-add-modules-path t)
      (typescript :variables
                  typescript-backend 'tide
                  typescript-linter 'eslint
                  typescript-fmt-tool 'prettier)
-
+     (elixir :variables elixir-backend 'alchemist)
      clojure
      emacs-lisp
      major-modes
-     (python :variables python-backend 'anaconda)
+     (python :variables
+             python-backend 'lsp
+             python-formatter 'black)
      ruby
-     (sql :variables sql-capitalize-keywords t)
+     (rust :variables rust-backend 'lsp)
+     (php :variables php-backend 'lsp)
+     java
+     (sql :variables sql-capitalize-keywords nil)
 
      ;; Non-programming languages
      (markdown :variables markdown-live-preview-engine 'vmd)
@@ -87,6 +94,7 @@ values."
 
      ;; Bring order to life
      (org :variables org-enable-reveal-js-support t)
+     (wakatime :variables wakatime-cli-path "~/.wakatime/wakatime-cli")
  
      ;; Documents
      latex
@@ -96,23 +104,29 @@ values."
      ;; Web
      html
      react
+     (vue :variables vue-backend 'lsp)
      restclient
      nginx
 
      ;; Tools
+     dap
+     gtags
+     (lsp :variables lsp-rust-server 'rust-analyzer)
      tide
+     import-js
+     floobits
      platformio
-     ipython-notebook
      ansible
-     
      docker
      git
      systemd
-     (shell :variables shell-default-shell 'multi-term)
+     gnus
+     graphviz
+     (shell :variables shell-default-shell 'vterm)
+     restclient    
 
      ;; fun stuff
      xkcd
-     spotify
      )
    ;; List of additional packages that will be installed without being wrapped
    ;; in a layer (generally the packages are installed only and should still be
@@ -140,7 +154,16 @@ values."
      ztree
      hcl-mode
      orgtbl-aggregate
+     auto-virtualenv
+     direnv
+     lsp-tailwindcss
+     (copilot :location (recipe
+                         :fetcher github
+                         :repo "copilot-emacs/copilot.el"
+                         :files ("*.el" "dist")))
+     lsp-grammarly
      )
+
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -326,7 +349,7 @@ values."
    ;; If non nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
    ;; (default nil) (Emacs 24.4+ only)
-   dotspacemacs-maximized-at-startup nil
+   dotspacemacs-maximized-at-startup t
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
@@ -395,10 +418,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;; helm-mode-handle-completion-in-region nil
    gnus-init-file "~/.spacemacs.d/gnus.el"
    )
-
   (add-to-list 'default-frame-alist
                '(font . "-ADBE-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1"))
-
   )
 
 (defun dotspacemacs/user-config ()
@@ -488,6 +509,11 @@ you should place you code here."
       (when (or (daemonp) (memq window-system '(mac ns x)))
         (exec-path-from-shell-initialize))
       ))
+      
+  (use-package direnv
+    :config
+    (direnv-mode))
+
 
   (spacemacs|define-custom-layout "@dotfiles"
     :binding "d"
@@ -520,12 +546,18 @@ you should place you code here."
        dired-omit-verbose nil
        dired-listing-switches "-alh --group-directories-first")))
 
+  (add-hook 'gnus-article-mode-hook
+            (lambda ()
+              (face-remap-add-relative 'default :size 16)
+              ))
+
   ;; Avoid calling autocompletion-in-region
   (with-eval-after-load "company"
     (define-key spacemacs-js2-mode-map-root-map
       (kbd "<tab>") 'company-indent-or-complete-common)
     (define-key spacemacs-rjsx-mode-map-root-map
       (kbd "<tab>") 'company-indent-or-complete-common)
+    (delq 'company-preview-if-just-one-frontend company-frontends)
     )
 
   ;; Ispell config
