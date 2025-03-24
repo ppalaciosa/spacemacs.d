@@ -52,7 +52,7 @@ values."
      (colors :variables
              colors-enable-rainbow-identifiers t)
 
-;; Programming Languages
+     ;; Programming Languages
      (c-c++ :variables
             c-c++-backend 'rtags
             c-c++-default-mode-for-headers 'c++-mode )
@@ -95,7 +95,7 @@ values."
      ;; Bring order to life
      (org :variables org-enable-reveal-js-support t)
      (wakatime :variables wakatime-cli-path "~/.wakatime/wakatime-cli")
- 
+
      ;; Documents
      latex
      bibtex
@@ -123,7 +123,7 @@ values."
      gnus
      graphviz
      (shell :variables shell-default-shell 'vterm)
-     restclient    
+     restclient
 
      ;; fun stuff
      xkcd
@@ -255,7 +255,7 @@ values."
    ;; Default font. `powerline-Scale' Allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
+                               :size 16
                                :weight normal
                                :width normal
                                :powerline-scale 1.0)
@@ -420,7 +420,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
    )
   (add-to-list 'default-frame-alist
                '(font . "-ADBE-Source Code Pro-normal-normal-normal-*-13-*-*-*-m-0-iso10646-1"))
+  (add-to-list 'default-frame-alist '(width . 80))  ; Width set to 80 characters
+  (add-to-list 'default-frame-alist '(height . 24)) ; Height set to 24 lines
   )
+
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -509,7 +512,7 @@ you should place you code here."
       (when (or (daemonp) (memq window-system '(mac ns x)))
         (exec-path-from-shell-initialize))
       ))
-      
+
   (use-package direnv
     :config
     (direnv-mode))
@@ -554,9 +557,9 @@ you should place you code here."
   ;; Avoid calling autocompletion-in-region
   (with-eval-after-load "company"
     (define-key spacemacs-js2-mode-map-root-map
-      (kbd "<tab>") 'company-indent-or-complete-common)
+                (kbd "<tab>") 'company-indent-or-complete-common)
     (define-key spacemacs-rjsx-mode-map-root-map
-      (kbd "<tab>") 'company-indent-or-complete-common)
+                (kbd "<tab>") 'company-indent-or-complete-common)
     (delq 'company-preview-if-just-one-frontend company-frontends)
     )
 
@@ -607,45 +610,45 @@ you should place you code here."
     :defer t
     :init
     (setq-default
-       org-src-fontify-natively t
-       ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M--
-       ;; instead to toggle)
-       org-replace-disputed-keys t
-       org-hide-leading-stars t
-       org-odd-levels-only t
-       org-ref-default-bibliography '("references.bib")
-       reftex-default-bibliography '("references.bib")
-       ;; TODO progress logging stuff
-       org-log-done 'time
-       org-export-with-sub-superscripts nil
-       org-latex-listings 'minted
-       TeX-engine 'xetex
-       TeX-PDF-mode t
-       org-latex-compiler "xelatex"
-       org-latex-pdf-process'("latexmk -pdf -f -pdflatex='%latex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
-       org-latex-default-packages-alist '(
-                                          ;; Not used with XeLaTeX
-                                          ("AUTO" "inputenc" t ("pdflatex"))
-                                          ("T1" "fontenc" t ("pdflatex"))
-                                          ("" "fontspec" t ("xelatex"))
-                                          ("" "polyglossia" t ("xelatex"))
-                                          ("" "graphicx" t)
-                                          ("" "grffile" t)
-                                          ("" "longtable" nil)
-                                          ("" "wrapfig" nil)
-                                          ("" "rotating" nil)
-                                          ("normalem" "ulem" t)
-                                          ("" "amsmath" t)
-                                          ("" "textcomp" t)
-                                          ("" "amssymb" t)
-                                          ("" "capt-of" nil)
-                                          ("" "hyperref" nil)
-                                          ("dvipsnames" "xcolor")
-                                          ("" "minted")
-                                          )
+     org-src-fontify-natively t
+     ;; org-mode: Don't ruin S-arrow to switch windows please (use M-+ and M--
+     ;; instead to toggle)
+     org-replace-disputed-keys t
+     org-hide-leading-stars t
+     org-odd-levels-only t
+     org-ref-default-bibliography '("references.bib")
+     reftex-default-bibliography '("references.bib")
+     ;; TODO progress logging stuff
+     org-log-done 'time
+     org-export-with-sub-superscripts nil
+     org-latex-listings 'minted
+     TeX-engine 'xetex
+     TeX-PDF-mode t
+     org-latex-compiler "xelatex"
+     org-latex-pdf-process'("latexmk -pdf -f -pdflatex='%latex --shell-escape -file-line-error -interaction=nonstopmode' -outdir=%o %f")
+     org-latex-default-packages-alist '(
+                                        ;; Not used with XeLaTeX
+                                        ("AUTO" "inputenc" t ("pdflatex"))
+                                        ("T1" "fontenc" t ("pdflatex"))
+                                        ("" "fontspec" t ("xelatex"))
+                                        ("" "polyglossia" t ("xelatex"))
+                                        ("" "graphicx" t)
+                                        ("" "grffile" t)
+                                        ("" "longtable" nil)
+                                        ("" "wrapfig" nil)
+                                        ("" "rotating" nil)
+                                        ("normalem" "ulem" t)
+                                        ("" "amsmath" t)
+                                        ("" "textcomp" t)
+                                        ("" "amssymb" t)
+                                        ("" "capt-of" nil)
+                                        ("" "hyperref" nil)
+                                        ("dvipsnames" "xcolor")
+                                        ("" "minted")
+                                        )
 
-    ;; Agenda and clock
-    org-clock-persist 'history)
+     ;; Agenda and clock
+     org-clock-persist 'history)
     :config
     (progn
       (org-clock-persistence-insinuate)
@@ -656,7 +659,7 @@ you should place you code here."
       (refresh-org-agenda-files)
 
       (add-to-list 'org-latex-packages-alist '("" "minted"))
-      
+
       (defun toggle-org-reveal-export-on-save ()
         (interactive)
         (if (memq 'org-reveal-export-to-html after-save-hook)
@@ -714,7 +717,7 @@ you should place you code here."
   ;; Workaround for eslint loading slow
   ;; A side effect is that eslint will always "detect" a config file
   ;; https://github.com/flycheck/flycheck/issues/1129
-   (use-package flycheck
+  (use-package flycheck
     :custom
     (flycheck-display-errors-delay 0.5)
     :config
@@ -761,7 +764,7 @@ you should place you code here."
     :config
 
     )
-    
+
   (use-package rainbow-mode
     :hook web-mode js2-mode)
 
@@ -882,4 +885,3 @@ you should place you code here."
      (ispell-dictionary . "castellano")
      (ispell-dictionary . "english")))
   )
-  
